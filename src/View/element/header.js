@@ -23,6 +23,7 @@ function Header(props) {
   const [logout, setLogOut] = useState(false);
   const [isAdmin, setAdmin] = useState(props.isAdmin);
   const [searchInput, setSearch] = useState("");
+  const [urlSearch, setUrlSearch] = useState(linkn.client_link + "home");
 
   const SignupSchema = Yup.object().shape({
     search_book: Yup.string()
@@ -32,38 +33,20 @@ function Header(props) {
       .required("Required name!!"),
   });
 
-  const [urlSearch, setUrlSearch] = useState(linkn.client_link + "home");
-
   //const log = !props.login;
   //const logout = props.login;
   useEffect(() => {
     setLog(!props.login);
     setLogOut(props.login);
     setAdmin(props.isAdmin);
-    setUrlSearch(linkn.client_link + "home?search=" + searchInput);
+    if (parseInt(props.isAdmin) === 1) {
+      setUrlSearch(linkn.client_link + "book/list?search=" + searchInput);
+    } else {
+      setUrlSearch(linkn.client_link + "home?search=" + searchInput);
+    }
   }, [props.login, props.isAdmin, searchInput]);
 
-  console.log(localStorage.getItem("codeLogin"));
-
-  const handleSumbitLogout = (e) => {
-    e.preventDefault();
-    const form = $(e.target);
-    $.ajax({
-      type: "POST",
-      url: form.attr("action"),
-      data: form.serialize(),
-      success(data) {
-        setResult(data);
-      },
-    });
-    localStorage.removeItem("codeLogin");
-    localStorage.removeItem("email");
-    localStorage.removeItem("password");
-    localStorage.removeItem("cart");
-    setLog(true);
-    setLogOut(false);
-    window.location.href("http://localhost:3000/");
-  };
+  //console.log(localStorage.getItem("codeLogin"));
 
   function drop_menu() {
     if (isAdmin === "1") {
@@ -71,14 +54,16 @@ function Header(props) {
         <div class="container">
           <Nav tabs>
             <NavItem>
-              <NavLink href={linkn.client_link}>Home</NavLink>
+              <NavLink href={linkn.client_link} style={{ color: "orange" }}>
+                Home
+              </NavLink>
             </NavItem>
             <Dropdown
               nav
               isOpen={toogleBook}
               toggle={() => settoogleBook(!toogleBook)}
             >
-              <DropdownToggle nav caret>
+              <DropdownToggle nav caret style={{ color: "orange" }}>
                 Book
               </DropdownToggle>
               <DropdownMenu>
@@ -98,7 +83,7 @@ function Header(props) {
               isOpen={toogleAuthor}
               toggle={() => settoogleAuthor(!toogleAuthor)}
             >
-              <DropdownToggle nav caret>
+              <DropdownToggle nav caret style={{ color: "orange" }}>
                 Author
               </DropdownToggle>
               <DropdownMenu>
@@ -113,7 +98,10 @@ function Header(props) {
               </DropdownMenu>
             </Dropdown>
             <NavItem>
-              <NavLink href={linkn.client_link + "buy_log/list"}>
+              <NavLink
+                href={linkn.client_link + "buy_log/list"}
+                style={{ color: "orange" }}
+              >
                 Buy log
               </NavLink>
             </NavItem>
@@ -125,20 +113,34 @@ function Header(props) {
         <div class="container">
           <Nav tabs>
             <NavItem>
-              <NavLink href={linkn.client_link + "home"}>Home</NavLink>
+              <NavLink
+                href={linkn.client_link + "home"}
+                style={{ color: "orange" }}
+              >
+                Home
+              </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href={linkn.client_link + "book/user/list"}>
+              <NavLink
+                href={linkn.client_link + "book/user/list"}
+                style={{ color: "orange" }}
+              >
                 Book
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href={linkn.client_link + "author/user/list"}>
+              <NavLink
+                href={linkn.client_link + "author/user/list"}
+                style={{ color: "orange" }}
+              >
                 Author
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href={linkn.client_link + "buy_log/list"}>
+              <NavLink
+                href={linkn.client_link + "buy_log/list"}
+                style={{ color: "orange" }}
+              >
                 Buy log
               </NavLink>
             </NavItem>
@@ -153,7 +155,7 @@ function Header(props) {
     <div>
       <div
         class="page-header"
-        style={{ backgroundColor: "#303134", marginTop: "0", padding: "10px" }}
+        style={{ backgroundColor: "#303134", marginTop: "0", padding: "15px 45px 15px" }}
       >
         <div class="container">
           <div class="row">
@@ -164,7 +166,7 @@ function Header(props) {
                 width={"50px"}
                 style={{ margin: "3px" }}
               />
-              <span style={{ color: "white", fontSize: "20px" }}>
+              <span style={{ color: "white", fontSize: "35px", fontFamily: "Brush Script MT", padding: "10px" }}>
                 Book store
               </span>
             </div>
@@ -186,17 +188,18 @@ function Header(props) {
                       <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                         <Field
                           name="search"
-                          placeholder="Enter name of the book"
+                          placeholder="Enter name to search"
                           className="form-control"
                           type="text"
                           onChange={(e) => setSearch(e.target.value)}
+                          style={{ margin: "4px", fontSize: "14px", fontStyle: 'italic' }}
                         />
                       </div>
                       <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
                         <button
                           type="submit"
                           class="btn btn-success btn-lg"
-                          style={{ margin: "4px" }}
+                          style={{ margin: "4px", fontSize: "14px" }}
                         >
                           Search
                         </button>
@@ -209,7 +212,7 @@ function Header(props) {
 
             <div
               class="col-xs-2 col-sm-2 col-md-2 col-lg-2"
-              style={{ marginTop: "5px" }}
+              style={{ marginTop: "10px" }}
             >
               <div class="row">
                 <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
@@ -217,7 +220,7 @@ function Header(props) {
                     <nav>
                       <ul id="dropmenu_account">
                         <li>
-                          <a href={linkn.client_link}>
+                          <a href={linkn.client_link} style={{fontWeight: 'bold'}}>
                             Account <i class="fa fa-user"></i>
                           </a>
                           <ul>
@@ -248,8 +251,8 @@ function Header(props) {
                         class="btn btn-success btn-lg"
                         style={{
                           margin: "2px",
-                          fontweight: "bold",
-                          fontSize: "14px",
+                          fontWeight: "bold",
+                          fontSize: "14px"
                         }}
                       >
                         Login <i class="fa fa-sign-in"></i>
@@ -265,7 +268,7 @@ function Header(props) {
                         class="btn btn-success btn-lg"
                         style={{
                           margin: "2px",
-                          fontweight: "bold",
+                          fontWeight: "bold",
                           backgroundColor: "#0054D2",
                           borderColor: "#0054D2",
                           fontSize: "14px",
@@ -293,7 +296,7 @@ function Header(props) {
                           margin: "1px",
                           padding: "7.5px",
                           fontWeight: "bold",
-                          fontSize: "14px"
+                          fontSize: "14px",
                         }}
                       >
                         Log out <i class="fa fa-sign-out"></i>

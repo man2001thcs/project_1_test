@@ -16,14 +16,14 @@ function BookComU(props) {
   return (
     <div className="outer">
       <div className="content">
-        <div className="img_card">
+        <div className="img_card" style={{ minWidth: '150px', minHeight: '170px',}}>
           <a href={link.client_link + "book/user/detail?id=" + props.id}>
             <img src={link?.image_link + props.id + ".jpg"} alt="Not found" width="150px" height="170px" />
           </a>
         </div>
-        <span className="bg animated fadeInDown">{props.type}</span>
-        <h4><strong>Tên tác phẩm: {props.name}</strong></h4>
-        <h4><strong>Tác giả: {props.author_id}</strong></h4>
+        <span className="bg animated fadeInDown"style={{marginBottom: "10px"}}>{props.type}</span>
+        <h4><strong>Book: {props.name}</strong></h4>
+        <h4><strong style={{fontSize: "14px"}}>Author: {props.author_id}</strong></h4>
         <div className="button">
           <a href="#">{props.price} đồng</a>
           <a

@@ -7,7 +7,6 @@ import { useLocation } from "react-router-dom";
 import BookComU from "../home/book_com";
 import link from "../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
-
 import "../../../../css/card_detail.css";
 import "../../../../css/quantity_button.css";
 
@@ -17,6 +16,7 @@ function BookDes(props) {
 
   const search = useLocation().search;
   const id = new URLSearchParams(search).get("id");
+  const nl2br = require('react-nl2br');
 
   const [listState1, setListState1] = useState();
   const [listState2, setListState2] = useState();
@@ -93,7 +93,7 @@ function BookDes(props) {
   const itemmap1 = listState1?.map((item, index) => {
     if (item["WpBook"].type === book?.WpBook.type)
       return (
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
           <BookComU
             key={index}
             id={item["WpBook"].id}
@@ -157,13 +157,29 @@ function BookDes(props) {
   function description() {
     if (toggleInfo === true) {
       return (
-        <div class="container-sm" style={{ padding: "25px 20px 25px" }}>
-          {book?.WpBook.description}
+        <div
+          class="container-sm"
+          style={{
+            backgroundColor: "white",
+            padding: "25px 20px 25px",
+            fontStyle: "italic",
+            whitespace: "pre-line"
+          }}
+        >
+          {nl2br(book?.WpBook.description)}
         </div>
       );
     } else {
       return (
-        <div class="container-sm" style={{ padding: "25px 20px 25px" }}>
+        <div
+          class="container-sm"
+          style={{
+            backgroundColor: "white",
+            padding: "25px 20px 25px",
+            fontStyle: "italic",
+            whitespace: "pre-line"
+          }}
+        >
           <p>
             Author Name:{" "}
             {find_author(book?.WpBook.author_id)?.WpAuthor.name ?? "Not found"}
@@ -212,6 +228,16 @@ function BookDes(props) {
     });
   };
 
+  function check_type(type) {
+    if (type === "novel"){
+      return "Novel";
+    } else  if (type === "short_story"){
+      return "Short story";
+    } else  if (type === "comic"){
+      return "Comic";
+    }
+  }
+
   return (
     <div>
       <div class="card">
@@ -219,17 +245,24 @@ function BookDes(props) {
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
             <div className="featured_text">
               <h2>
-                Category: <span>{book?.WpBook.type}</span>
+                Category: <span>{check_type(book?.WpBook.type)}</span>
               </h2>
               <h3>
-                Author:
-                <span>
-                  {find_author(book?.WpBook.author_id)?.WpAuthor.name}
+                Author: <span style={{fontSize: '20px'}}>
+                   {find_author(book?.WpBook.author_id)?.WpAuthor.name}
                 </span>
               </h3>
             </div>
-            <div className="image">
-              <img src={link.image_link + id + ".jpg"} alt="" />
+            <div
+              className="image"
+              style={{ minWidth: "300px", minHeight: "340px" }}
+            >
+              <img
+                src={link.image_link + id + ".jpg"}
+                alt="Not found"
+                width="300px"
+                height="340px"
+              />
             </div>
           </div>
           <div
@@ -350,7 +383,7 @@ function BookDes(props) {
         <div class="panel panel-default">
           <div class="panel-heading">
             <h2 class="panel-title">
-              <strong>Same category</strong>
+              <strong style={{ fontSize: "20px" }}>Same category</strong>
             </h2>
           </div>
           <div class="panel-body">

@@ -36,7 +36,7 @@ function App() {
   const [loginState, setLoginState] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
-  const [logined, setLogined] = useState(false);
+  const [logined, setLogined] = useState();
   const [isAdmin, setAdmin] = useState();
   const urlAccount =
     "http://localhost/php_server/controller/user/log_session/" +

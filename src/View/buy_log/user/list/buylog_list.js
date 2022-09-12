@@ -77,7 +77,7 @@ function BuyLogList(props) {
     <div>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Buy log list</h3>
+          <h3 class="panel-title" style={{fontSize: "20px", fontWeight: "bold"}}>Buy log list</h3>
         </div>
         <div class="panel-body">
           <table class="table table-hover">
@@ -92,6 +92,7 @@ function BuyLogList(props) {
                 <th>Price</th>               
                 <th>Total price</th>
                 <th>State</th>
+                <th></th>
               </tr>
             </thead>
             {itemmap1}

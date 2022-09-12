@@ -5,15 +5,24 @@ import { NavLink } from "reactstrap";
 import link from "../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+
 function BuyLogCom(props) {
   const [listState1, setListState1] = useState();
   const [listState2, setListState2] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
-  
-  const urlReceive = link.buylog_link +
+
+  const urlReceive =
+    link.buylog_link +
     localStorage.getItem("codeLogin") +
-    ".json&timeStamp=" + GenerateRandomCode.NumCode(4);
+    ".json&timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   console.log(props.state);
   useEffect(() => {
@@ -39,8 +48,10 @@ function BuyLogCom(props) {
     });
   }, []);
 
-  const urlBook = link.book_link +
-    "user_book.json&timeStamp=" + GenerateRandomCode.NumCode(4);
+  const urlBook =
+    link.book_link +
+    "user_book.json&timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   console.log(props.state);
   useEffect(() => {
@@ -69,7 +80,11 @@ function BuyLogCom(props) {
   function complete_receive(state) {
     if (state === "0") {
       return <td>On progress</td>;
-    } else return <td>Complete</td>;
+    } else if (state === "1") {
+      return <td>Complete</td>;
+    } else if (state === "2") {
+      return <td>Deleted</td>;
+    }
   }
 
   console.log(listState1);
@@ -98,6 +113,16 @@ function BuyLogCom(props) {
       );
     });
 
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <tbody>
       <tr>
@@ -116,12 +141,7 @@ function BuyLogCom(props) {
               action={link.server_link + "controller/receive/edit.php"}
               method="post"
             >
-              <input
-                type="hidden"
-                name="id"
-                id="id"
-                Value={props.id}
-              />
+              <input type="hidden" name="id" id="id" Value={props.id} />
               <input
                 type="hidden"
                 name="emailS"
@@ -135,10 +155,11 @@ function BuyLogCom(props) {
                 Value={localStorage.getItem("codeLogin")}
               />
               <button
-                type="submit"
+                type="button"
                 class="btn btn-success"
                 id="viewButton"
                 name="viewButton"
+                onClick={() => handleClickOpen()}
               >
                 Complete
               </button>
@@ -147,6 +168,47 @@ function BuyLogCom(props) {
         </td>
       </tr>
       {cart}
+      <div>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title"  style={{fontSize: "18px", fontWeight: 'bold'}}>
+            {"Warning!"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description" style={{fontSize: "14px"}}>
+              Are you sure?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <form
+              action={link.server_link + "controller/receive/edit.php"}
+              method="post"
+            >
+              <input type="hidden" name="id" id="id" Value={props.id} />
+              <input
+                type="hidden"
+                name="emailS"
+                id="emailS"
+                Value={localStorage.getItem("email")}
+              />
+              <input
+                type="hidden"
+                name="codeS"
+                id="codeS"
+                Value={localStorage.getItem("codeLogin")}
+              />
+              <Button type="submit" style={{fontSize: "14px"}}>Complete</Button>
+              <Button onClick={handleClose} autoFocus style={{fontSize: "14px"}}>
+                Close
+              </Button>
+            </form>
+          </DialogActions>
+        </Dialog>
+      </div>
     </tbody>
   );
 }

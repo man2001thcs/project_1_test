@@ -154,7 +154,7 @@ function CartView(props) {
         <div className="summary">
           <div className="summary-total-items">
             <span className="total-items" /> Items: {itemsNum}
-            <a href="../../main_page/main/list.php">Turn back</a>
+            <a href="../../main_page/main/list.php" style={{marginLeft: '15px'}}>Turn back</a>
           </div>
           <div className="summary-subtotal">
             <div className="subtotal-title">Total price:</div>

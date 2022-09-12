@@ -101,8 +101,8 @@ function EditUser() {
       <Formik
         initialValues={{
           name: loginState?.fullname,
-          phone_number: loginState?.address,
-          address: loginState?.phone_number,
+          phone_number: loginState?.phone_number,
+          address: loginState?.address,
         }}
         enableReinitialize={true}
         validationSchema={SignupSchema}
