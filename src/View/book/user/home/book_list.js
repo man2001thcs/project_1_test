@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import link from "../../../../config/const";
@@ -17,8 +16,10 @@ function BookListU(props) {
   const search = useLocation().search;
   const searchInput = new URLSearchParams(search).get("search");
 
-  const urlBook = link.book_link +
-    "user_book.json?timeStamp=" + GenerateRandomCode.NumCode(4);
+  const urlBook =
+    link.book_link +
+    "user_book.json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   useEffect(() => {
     const getData = async () => {
@@ -43,8 +44,10 @@ function BookListU(props) {
     });
   }, []);
 
-  const urlAuthor = link.author_link +
-    "user_author.json?timeStamp=" + GenerateRandomCode.NumCode(4);
+  const urlAuthor =
+    link.author_link +
+    "user_author.json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   useEffect(() => {
     const getData = async () => {
@@ -77,6 +80,17 @@ function BookListU(props) {
     });
   }
 
+  function check_type(type) {
+    if (type === "novel"){
+      return "Novel";
+    } else  if (type === "short_story"){
+      return "Short story";
+    } else  if (type === "comic"){
+      return "Comic";
+    }
+  }
+
+
   console.log(find_author("1"));
 
   function bookListShow(typeN) {
@@ -84,7 +98,9 @@ function BookListU(props) {
       //console.log("ok");
       const bookListSearch = listState1
         ?.filter(
-          (item) => item?.WpBook.type === typeN && (item?.WpBook.name).includes(searchInput)
+          (item) =>
+            item?.WpBook.type === typeN &&
+            (item?.WpBook.name).includes(searchInput)
         )
         .map((item, index) => {
           return (
@@ -98,12 +114,12 @@ function BookListU(props) {
                   "Not found!!"
                 }
                 price={item["WpBook"].price}
-                type="Novel"
+                type={check_type(item["WpBook"].type)}
               ></BookComU>
             </div>
           );
         });
-        return bookListSearch;
+      return bookListSearch;
     } else {
       const bookListAll = listState1
         ?.filter((item) => item?.WpBook.type === typeN)
@@ -119,7 +135,7 @@ function BookListU(props) {
                   "Not found!!"
                 }
                 price={item["WpBook"].price}
-                type="Novel"
+                type={check_type(item["WpBook"].type)}
               ></BookComU>
             </div>
           );
@@ -128,68 +144,42 @@ function BookListU(props) {
     }
   }
 
-  /*const itemmap1 = listState1?.map((item, index) => {
-    if (item["WpBook"].type === "novel")
-      return (
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-          <BookComU
-            key={index}
-            id={item["WpBook"].id}
-            name={item["WpBook"].name}
-            author_id={
-              find_author(item["WpBook"].author_id)?.WpAuthor.name ??
-              "Not found!!"
-            }
-            price={item["WpBook"].price}
-            type="Novel"
-          ></BookComU>
-        </div>
-      );
-  });
- 
-
-  const itemmap2 = listState1?.map((item, index) => {
-    if (item["WpBook"].type === "short_story")
-      return (
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-          <BookComU
-            key={index}
-            id={item["WpBook"].id}
-            name={item["WpBook"].name}
-            author_id={
-              find_author(item["WpBook"].author_id)?.WpAuthor.name ??
-              "Not found!!"
-            }
-            price={item["WpBook"].price}
-            type="Short story"
-          ></BookComU>
-        </div>
-      );
-  });
-   */
-
   return (
     <div className="container">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">
-            <strong>Tiểu thuyết</strong>
+            <strong style={{ fontSize: "20px" }}>Tiểu thuyết</strong>
           </h2>
         </div>
         <div class="panel-body">
-          <div class="row" style={{ paddingLeft: "2%"}}>
+          <div class="row" style={{ paddingLeft: "2%" }}>
             {bookListShow("novel")}
           </div>
         </div>
-
+      </div>
+      <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">
-            <strong>Truyện ngắn</strong>
+            <strong style={{ fontSize: "20px" }}>Truyện ngắn</strong>
           </h2>
         </div>
         <div class="panel-body">
           <div class="row" style={{ paddingLeft: "2%" }}>
             {bookListShow("short_story")}
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">
+            <strong style={{ fontSize: "20px" }}>Comic</strong>
+          </h2>
+        </div>
+        <div class="panel-body">
+          <div class="row" style={{ paddingLeft: "2%" }}>
+            {bookListShow("comic")}
           </div>
         </div>
       </div>
