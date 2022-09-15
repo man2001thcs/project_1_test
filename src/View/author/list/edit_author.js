@@ -10,6 +10,13 @@ import { useEffect } from "react";
 import link from "../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import InputLabel from "@mui/material/InputLabel";
+import { Button } from "@mui/material";
+import { ActionTypes } from "@mui/base";
+
 function EditAuthor() {
   const [result, setResult] = useState("");
   const search = useLocation().search;
@@ -18,6 +25,7 @@ function EditAuthor() {
   const [listState2, setListState2] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
+  const [isSubmitting, setSubmitting] = useState();
 
   const [inputName, setInputName] = useState("");
   const [inputAddress, setInputAddress] = useState("");
@@ -86,19 +94,24 @@ function EditAuthor() {
       .required("Required description!!"),
   });
 
-  const isSubmitting = false;
-
-  const handleSumbit = (e) => {
+  const handleSubmitM = (e) => {
     e.preventDefault();
-    const form = $(e.target);
-    $.ajax({
-      type: "POST",
-      url: form.attr("action"),
-      data: form.serialize(),
-      success(data) {
-        setResult(data);
-      },
-    });
+    setSubmitting(true);
+    setTimeout(() => {
+      const form = $(e.target);
+      $.ajax({
+        type: "POST",
+        url: link.server_link + "controller/author/edit.php",
+        data: form.serialize(),
+        success(data) {
+          console.log(data);
+          setResult(data);
+        },
+      });
+      alert("Change complete!!");
+      setSubmitting(false);
+      window.location.href = link.client_link + "author/list";
+    }, 2000);
   };
 
   function edit_author(inputName, inputAddress, inputPhone, inputSpecial) {
@@ -111,113 +124,110 @@ function EditAuthor() {
         {parseInt(success) === 1 && (
           <h3 style={{ color: "green" }}>Change successed</h3>
         )}
-        <Formik
-          validationSchema={SignupSchema}
+
+        <form
+          action={link.server_link + "controller/author/edit.php"}
+          method="post"
           onSubmit={(event) => {
-            handleSumbit(event);
+            handleSubmitM(event);
           }}
         >
-          {({ errors, touched }) => (
-            <form
-              action={link.server_link + "controller/author/edit.php"}
-              method="post"
-            >
-              <div>
-                <div class="row">
-                  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <div className="form-group">
-                      <label htmlFor="name">Name:</label>
-                      <Field
-                        name="name"
-                        className="form-control"
-                        type="text"
-                        value={inputName}
-                        onChange={(e) => setInputName(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <div className="form-group">
-                      <label htmlFor="address">Address:</label>
-                      <Field
-                        name="address"
-                        className="form-control"
-                        type="text"
-                        value={inputAddress}
-                        onChange={(e) => setInputAddress(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <div className="form-group">
-                      <label htmlFor="phone">Phone:</label>
-                      <Field
-                        name="phone"
-                        className="form-control"
-                        type="text"
-                        value={inputPhone}
-                        onChange={(e) => setInputPhone(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <div className="form-group">
-                      <label htmlFor="specialization">Description:</label>
-                      <Field
-                        name="specialization"
-                        className="form-control"
-                        as="textarea"
-                        value={inputSpecial}
-                        onChange={(e) => setInputSpecial(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <div className="form-group">
-                      <input
-                        type="hidden"
-                        name="id"
-                        id="id"
-                        Value={author?.WpAuthor.id}
-                      />
-                      <input
-                        type="hidden"
-                        name="emailS"
-                        id="emailS"
-                        Value={localStorage.getItem("email")}
-                      />
-                      <input
-                        type="hidden"
-                        name="codeS"
-                        id="codeS"
-                        Value={localStorage.getItem("codeLogin")}
-                      />
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Please wait..." : "Submit"}
-                      </button>
-                    </div>
-                  </div>
+          <div>
+            <div class="row">
+              <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div className="form-group">
+                  <label htmlFor="name">Name:</label>
+                  <TextField
+                    name="name"
+                    className="form-control"
+                    type="text"
+                    value={inputName}
+                    onChange={(e) => setInputName(e.target.value)}
+                  />
                 </div>
               </div>
-            </form>
-          )}
-        </Formik>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div className="form-group">
+                  <label htmlFor="address">Address:</label>
+                  <TextField
+                    name="address"
+                    className="form-control"
+                    type="text"
+                    value={inputAddress}
+                    onChange={(e) => setInputAddress(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div className="form-group">
+                  <label htmlFor="phone">Phone:</label>
+                  <TextField
+                    name="phone"
+                    className="form-control"
+                    type="text"
+                    value={inputPhone}
+                    onChange={(e) => setInputPhone(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div className="form-group">
+                  <label htmlFor="specialization">Description:</label>
+                  <TextField
+                    name="specialization"
+                    className="form-control"
+                    value={inputSpecial}
+                    onChange={(e) => setInputSpecial(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div className="form-group">
+                  <input
+                    type="hidden"
+                    name="id"
+                    id="id"
+                    Value={author?.WpAuthor.id}
+                  />
+                  <input
+                    type="hidden"
+                    name="emailS"
+                    id="emailS"
+                    Value={localStorage.getItem("email")}
+                  />
+                  <input
+                    type="hidden"
+                    name="codeS"
+                    id="codeS"
+                    Value={localStorage.getItem("codeLogin")}
+                  />
+                  <Button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isSubmitting}
+                    color="primary"
+                    variant="contained"
+                    fullWidth
+                  >
+                    {isSubmitting ? "Please wait..." : "Submit"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
     );
   }

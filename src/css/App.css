@@ -11,6 +11,10 @@
   text-align: center;
 }
 
+.row {
+  padding-bottom: 12px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

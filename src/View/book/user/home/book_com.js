@@ -11,8 +11,6 @@ function BookComU(props) {
   const [deleting, setDelete] = useState(false);
   const [result, setResult] = useState("");
 
-  console.log(link);
-
   return (
     <div className="outer">
       <div className="content">

@@ -28,9 +28,7 @@ function BookList(props) {
 
   const urlBook =
     link.server_link +
-    "controller/book/log_session/" +
-    localStorage.getItem("codeLogin") +
-    ".json?timeStamp=" +
+    "controller/book/log_session/user_book.json?timeStamp=" +
     GenerateRandomCode.NumCode(4);
 
   useEffect(() => {

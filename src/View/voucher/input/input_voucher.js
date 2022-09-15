@@ -6,15 +6,15 @@ import bootstrap from "bootstrap";
 import { useState } from "react";
 import link from "../../../config/const";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
-import { ActionTypes } from "@mui/base";
 
-function InputAuthor() {
+function InputVoucher() {
   const [result, setResult] = useState("");
   const search = useLocation().search;
   const success = new URLSearchParams(search).get("success");
@@ -24,18 +24,25 @@ function InputAuthor() {
       .min(2, "Too Short!")
       .max(70, "Too Long!")
       .required("Required name!!"),
-    phone: Yup.number("Enter a valid number").required("Required number!!"),
-    address: Yup.string().required("Required address!!"),
-    specialization: Yup.string()
-      .min(2, "Too Short!")
-      .required("Required description!!"),
+    threshold: Yup.number("Enter a valid number")
+      .max(100000000, "Too Long!")
+      .required("Required number!!"),
+    number_thres: Yup.number("Enter a valid number")
+      .max(100000000, "Too Long!")
+      .required("Required number!!"),
+    discount: Yup.number("Enter a valid number")
+      .max(10000000, "Too Long!")
+      .required("Required number!!"),
+    discount_rate: Yup.number("Enter a valid number")
+      .max(10000000, "Too Long!")
+      .required("Required number!!"),
   });
   const isSubmitting = false;
 
   const handleSubmit = (values) => {
     $.ajax({
       type: "POST",
-      url: link.server_link + "controller/author/create.php",
+      url: link.server_link + "controller/voucher/create.php",
       data: values,
       success(data) {
         console.log(data);
@@ -47,38 +54,37 @@ function InputAuthor() {
   const formik = useFormik({
     initialValues: {
       name: "",
-      address: "",
-      phone: "",
-      specialization: "",
+      threshold: "",
+      number_thres: "",
+      discount: "",
+      discount_rate: "",
       emailS: localStorage.getItem("email"),
-      codeS: localStorage.getItem("codeLogin")
+      codeS: localStorage.getItem("codeLogin"),
     },
     validationSchema: SignupSchema,
     onSubmit: (values, actions) => {
       setTimeout(() => {
-        console.log(values);
         handleSubmit(values);
         actions.setSubmitting(false);
         actions.resetForm({
           values: {
             // the type of `values` inferred to be Blog
             name: "",
-            address: "",
-            phone: "",
-            specialization: "",
+            threshold: "",
+            number_thres: "",
+            discount: "",
+            discount_rate: "",
           },
-
           // you can also set the other form states here
         });
         alert("Insert complete!!");
-        //window.location.href = link.client_link + "author/list";
       }, 2000);
     },
   });
 
   return (
     <div>
-      <h1>Insert author</h1>
+      <h1>Insert Voucher</h1>
       {parseInt(success) === 0 && (
         <h3 style={{ color: "red" }}>Insert failed</h3>
       )}
@@ -87,11 +93,12 @@ function InputAuthor() {
       )}
 
       <form
-        action={link.server_link + "controller/author/create.php"}
+        action={link.server_link + "controller/voucher/create.php"}
         method="post"
         onSubmit={formik.handleSubmit}
       >
         <div
+          class="container"
           style={{
             backgroundColor: "white",
             borderRadius: "10px",
@@ -119,59 +126,19 @@ function InputAuthor() {
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
               <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Phone</InputLabel>
+                <InputLabel style={{ fontSize: 12 }}>Threshold</InputLabel>
                 <TextField
-                  name="phone"
+                  name="threshold"
                   className="form-control"
                   variant="standard"
-                  value={formik.values.phone}
+                  value={formik.values.threshold}
                   onChange={formik.handleChange}
                   inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  error={formik.touched.phone && Boolean(formik.errors.phone)}
-                  helperText={formik.touched.phone && formik.errors.phone}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Address</InputLabel>
-                <TextField
-                  name="address"
-                  className="form-control"
-                  variant="standard"
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  value={formik.values.address}
-                  onChange={formik.handleChange}
                   error={
-                    formik.touched?.address && Boolean(formik.errors?.address)
-                  }
-                  helperText={formik.touched?.address && formik.errors?.address}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Description</InputLabel>
-                <TextField
-                  name="specialization"
-                  className="form-control"
-                  variant="standard"
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  value={formik.values.specialization}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched?.specialization &&
-                    Boolean(formik.errors?.specialization)
+                    formik.touched.threshold && Boolean(formik.errors.threshold)
                   }
                   helperText={
-                    formik.touched?.specialization &&
-                    formik.errors?.specialization
+                    formik.touched.threshold && formik.errors.threshold
                   }
                 />
               </div>
@@ -181,6 +148,87 @@ function InputAuthor() {
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
               <div className="form-group">
+                <InputLabel style={{ fontSize: 12 }}>Threshold number</InputLabel>
+                <TextField
+                  name="number_thres"
+                  className="form-control"
+                  variant="standard"
+                  value={formik.values.number_thres}
+                  onChange={formik.handleChange}
+                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                  error={
+                    formik.touched.number_thres &&
+                    Boolean(formik.errors.number_thres)
+                  }
+                  helperText={
+                    formik.touched.number_thres && formik.errors.number_thres
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              <div className="form-group">
+                <InputLabel style={{ fontSize: 12 }}>Discount</InputLabel>
+                <TextField
+                  name="discount"
+                  className="form-control"
+                  variant="standard"
+                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                  value={formik.values.discount}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched?.discount && Boolean(formik.errors?.discount)
+                  }
+                  helperText={
+                    formik.touched?.discount && formik.errors?.discount
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              <div className="form-group">
+                <InputLabel style={{ fontSize: 12 }}>Discount rate</InputLabel>
+                <TextField
+                  name="discount_rate"
+                  className="form-control"
+                  variant="standard"
+                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                  value={formik.values.discount_rate}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched?.discount_rate &&
+                    Boolean(formik.errors?.discount_rate)
+                  }
+                  helperText={
+                    formik.touched?.discount_rate &&
+                    formik.errors?.discount_rate
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              <div className="form-group">
+                <TextField
+                  type="hidden"
+                  name="emailS"
+                  id="emailS"
+                  value={localStorage.getItem("email")}
+                />
+                <TextField
+                  type="hidden"
+                  name="codeS"
+                  id="codeS"
+                  value={localStorage.getItem("codeLogin")}
+                />
                 <Button
                   type="submit"
                   className="btn btn-primary"
@@ -200,4 +248,4 @@ function InputAuthor() {
   );
 }
 
-export default InputAuthor;
+export default InputVoucher;

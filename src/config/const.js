@@ -17,6 +17,9 @@ const receive_link =
 const buylog_link =
   "http://localhost/php_server/controller/buy_log/log_session/";
 
+const voucher_link =
+  "http://localhost/php_server/controller/voucher/log_session/";
+
 export default {
   client_link,
   server_link,
@@ -26,4 +29,5 @@ export default {
   user_link,
   receive_link,
   buylog_link,
+  voucher_link
 };

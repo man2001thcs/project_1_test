@@ -18,6 +18,7 @@ import linkn from "../../config/const";
 function Header(props) {
   const [toogleBook, settoogleBook] = useState(false);
   const [toogleAuthor, settoogleAuthor] = useState(false);
+  const [toogleVoucher, settoogleVoucher] = useState(false);
   const [result, setResult] = useState("");
   const [log, setLog] = useState(false);
   const [logout, setLogOut] = useState(false);
@@ -97,6 +98,25 @@ function Header(props) {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
+            <Dropdown
+              nav
+              isOpen={toogleVoucher}
+              toggle={() => settoogleVoucher(!toogleVoucher)}
+            >
+              <DropdownToggle nav caret style={{ color: "orange" }}>
+                Voucher
+              </DropdownToggle>
+              <DropdownMenu>
+                <DropdownItem header>Author item</DropdownItem>
+                <DropdownItem href={linkn.client_link + "voucher/input"}>
+                  Insert new voucher
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem href={linkn.client_link + "voucher/list"}>
+                  Voucher list
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
             <NavItem>
               <NavLink
                 href={linkn.client_link + "buy_log/list"}
@@ -158,7 +178,7 @@ function Header(props) {
         style={{ backgroundColor: "#303134", marginTop: "0", padding: "15px 45px 15px" }}
       >
         <div class="container">
-          <div class="row">
+          <div class="row" style={{ paddingBottom: "0px"}}>
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
               <img
                 src={require("../../image/book_logo.png")}
@@ -284,8 +304,14 @@ function Header(props) {
                   >
                     <input
                       type="hidden"
-                      name="loginCode"
-                      id="loginCode"
+                      name="emailS"
+                      id="emailS"
+                      value={localStorage.getItem("email")}
+                    />
+                    <input
+                      type="hidden"
+                      name="codeS"
+                      id="codeS"
                       value={localStorage.getItem("codeLogin")}
                     />
                     {logout && (

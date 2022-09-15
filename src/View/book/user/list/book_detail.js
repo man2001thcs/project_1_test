@@ -16,13 +16,18 @@ function BookDes(props) {
 
   const search = useLocation().search;
   const id = new URLSearchParams(search).get("id");
-  const nl2br = require('react-nl2br');
+  const nl2br = require("react-nl2br");
 
   const [listState1, setListState1] = useState();
   const [listState2, setListState2] = useState();
+  const [listState3, setListState3] = useState();
   const [toggleInfo, setToggle] = useState(true);
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
+
+  const [discount_id, setDiscount_id] = useState();
+  const [discount_rate, setDiscount] = useState(0);
+  const [item_n, setItemN] = useState(0);
 
   const urlBook =
     link.book_link +
@@ -43,6 +48,34 @@ function BookDes(props) {
       }
     };
     fetch(urlBook, {
+      method: "HEAD",
+    }).then((res) => {
+      if (res.ok) {
+        getData();
+      } else {
+      }
+    });
+  }, []);
+
+  const urlVoucher =
+    link.voucher_link +
+    "user_voucher.json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axios.get(urlVoucher);
+        setListState3(response.data);
+        //console.log(response.data);
+      } catch (err) {
+        setError(err.message);
+        setListState3(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch(urlVoucher, {
       method: "HEAD",
     }).then((res) => {
       if (res.ok) {
@@ -83,10 +116,18 @@ function BookDes(props) {
   const book = listState1?.find((element) => {
     return element.WpBook.id === id;
   });
+  //console.log(book);
+  //console.log(book?.WpBook.voucher_id?.split(","));
 
   function find_author(author_id) {
     return listState2?.find((element) => {
       return element.WpAuthor.id === author_id;
+    });
+  }
+
+  function find_voucher(voucher_id) {
+    return listState3?.find((element) => {
+      return element.WpVoucher.id === voucher_id;
     });
   }
 
@@ -109,6 +150,52 @@ function BookDes(props) {
       );
   });
 
+  const itemmap2 = book?.WpBook.voucher_id?.split(";")?.filter(item => item !== "").map((item, index) => {
+    var voucher = find_voucher(item);
+    return (
+      <div>
+        {voucher?.WpVoucher.name.indexOf("DISCOUNT") !== -1 && (
+          <span
+            style={{
+              display: "inline",
+              backgroundColor: "#FBEBED",
+              padding: "5px 6px 5px",
+              color: "#EE4F2F",
+            }}
+            title={
+              "Buy more than " +
+              voucher?.WpVoucher.number_thres +
+              " items, get " +
+              voucher?.WpVoucher.discount_rate +
+              " discount per item"
+            }
+          >
+            {voucher?.WpVoucher.name}
+          </span>
+        )}
+        {voucher?.WpVoucher.name.indexOf("PRICE") !== -1 && (
+          <span
+            style={{
+              display: "inline",
+              backgroundColor: "#FBEBED",
+              padding: "5px 6px 5px",
+              color: "#EE4F2F",
+            }}
+            title={
+              " Get " +
+              voucher?.WpVoucher.discount +
+              " discount (Only when total price reach " +
+              voucher?.WpVoucher.threshold +
+              " discount per item"
+            }
+          >
+            {voucher?.WpVoucher.name}
+          </span>
+        )}
+      </div>
+    );
+  });
+
   function remain(book) {
     if (parseInt(book?.WpBook.remain_number) > 0) {
       return <p>Still remain</p>;
@@ -128,6 +215,21 @@ function BookDes(props) {
     }
   };
 
+  useEffect(() => {
+    book?.WpBook.voucher_id?.split(";")?.filter(item => item !== "").map((item, index) => {
+      var voucher = listState3?.find((element) => {
+        return element.WpVoucher.id === item;
+      });
+      if (voucher?.WpVoucher.name.indexOf("DISCOUNT") !== -1) {
+        setDiscount_id(voucher?.WpVoucher.id);
+        setItemN(voucher?.WpVoucher.number_thres);
+        setDiscount(voucher?.WpVoucher.discount_rate);
+        console.log(item_n);
+        console.log(discount_rate);
+      }
+    });
+  }, [listState3, valueNumber]);
+
   const addCart = () => {
     if (valueNumber <= parseInt(book?.WpBook.remain_number)) {
       const item = {
@@ -139,12 +241,16 @@ function BookDes(props) {
         number: valueNumber,
         price: book?.WpBook.price,
         total_price: parseInt(book?.WpBook.price) * parseInt(valueNumber),
+        rate:
+          parseInt(valueNumber) >= parseInt(item_n)
+            ? 1 - parseFloat(discount_rate)
+            : 1,
+        discount: book?.WpBook.voucher_id,
+        item_discount_id: discount_id
       };
-      //console.log(item);
 
       var temp = JSON.parse(localStorage.getItem("cart") || "[]");
       temp.push(item);
-
       localStorage.setItem("cart", JSON.stringify(temp));
       //localStorage.removeItem("cart");
 
@@ -163,7 +269,7 @@ function BookDes(props) {
             backgroundColor: "white",
             padding: "25px 20px 25px",
             fontStyle: "italic",
-            whitespace: "pre-line"
+            whitespace: "pre-line",
           }}
         >
           {nl2br(book?.WpBook.description)}
@@ -177,7 +283,7 @@ function BookDes(props) {
             backgroundColor: "white",
             padding: "25px 20px 25px",
             fontStyle: "italic",
-            whitespace: "pre-line"
+            whitespace: "pre-line",
           }}
         >
           <p>
@@ -229,11 +335,11 @@ function BookDes(props) {
   };
 
   function check_type(type) {
-    if (type === "novel"){
+    if (type === "novel") {
       return "Novel";
-    } else  if (type === "short_story"){
+    } else if (type === "short_story") {
       return "Short story";
-    } else  if (type === "comic"){
+    } else if (type === "comic") {
       return "Comic";
     }
   }
@@ -248,8 +354,9 @@ function BookDes(props) {
                 Category: <span>{check_type(book?.WpBook.type)}</span>
               </h2>
               <h3>
-                Author: <span style={{fontSize: '20px'}}>
-                   {find_author(book?.WpBook.author_id)?.WpAuthor.name}
+                Author:{" "}
+                <span style={{ fontSize: "20px" }}>
+                  {find_author(book?.WpBook.author_id)?.WpAuthor.name}
                 </span>
               </h3>
             </div>
@@ -270,16 +377,20 @@ function BookDes(props) {
             style={{ display: "inline-block" }}
           >
             <div className="description">
-              <h2>Book name:</h2>
+              <h2>Book name</h2>
               <p style={{ fontWeight: "bold" }}>{book?.WpBook.name}</p>
             </div>
             <div className="description">
-              <h2>Author:</h2>
+              <h2>Author</h2>
               <p> {find_author(book?.WpBook.author_id)?.WpAuthor.name}</p>
             </div>
             <div className="description">
-              <h2>Category:</h2>
+              <h2>Category</h2>
               <p>{book?.WpBook.type}</p>
+            </div>
+            <div className="description">
+              <h2>Voucher</h2>
+              {itemmap2}
             </div>
             <div className="description">
               <h2>Status</h2>
@@ -332,7 +443,7 @@ function BookDes(props) {
                   id="buy_button"
                   onClick={() => addCart()}
                 >
-                  Thêm vào giỏ hàng
+                  Add to cart
                 </button>
                 <button
                   type="button"
@@ -340,7 +451,7 @@ function BookDes(props) {
                   style={{ backgroundColor: "red", borderColor: "red" }}
                   href={link.client_link}
                 >
-                  Quay về
+                  Back
                 </button>
               </div>
             </form>

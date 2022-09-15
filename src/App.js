@@ -17,6 +17,10 @@ import AuthorList from "./View/author/list/author_list";
 import EditBook from "./View/book/admin/list/edit_book";
 import EditAuthor from "./View/author/list/edit_author";
 
+import VoucherList from "./View/voucher/list/voucher_list";
+import InputVoucher from "./View/voucher/input/input_voucher";
+import EditVoucher from "./View/voucher/list/edit_voucher";
+
 import Login from "./View/user/log/login";
 import SignIn from "./View/user/log/signIn";
 import BuyLogList from "./View/buy_log/user/list/buylog_list";
@@ -100,6 +104,9 @@ function App() {
                   <Route path="author/input" element={<InputAuthor />} />
                   <Route path="author/edit" element={<EditAuthor />} />
                   <Route path="author/list" element={<AuthorList />} />
+                  <Route path="voucher/input" element={<InputVoucher />} />
+                  <Route path="voucher/edit" element={<EditVoucher />} />
+                  <Route path="voucher/list" element={<VoucherList />} />
                   <Route path="buy_log/list" element={<BuyLogList_Admin />} /> 
                   
                 </Route>

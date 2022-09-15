@@ -5,13 +5,17 @@ import link from "../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 import $ from "jquery";
 
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import InputLabel from "@mui/material/InputLabel";
 
-function AuthorCom(props) {
+
+function VoucherCom(props) {
   const [appear, set_appear] = useState(false);
-
+  const [isSubmitting, setSubmitting] = useState("");
   const [deleting, setDelete] = useState(false);
   const [result, setResult] = useState("");
-  const [isSubmitting, setSubmitting] = useState();
   const edit_button = () => {
     set_appear(true);
   };
@@ -27,10 +31,10 @@ function AuthorCom(props) {
     e.preventDefault();
     setSubmitting(true);
     setTimeout(() => {
-      const form = $(e.target);
+      const form = $(e.target);  
       $.ajax({
         type: "POST",
-        url: link.server_link + "controller/author/delete.php",
+        url: link.server_link + "controller/voucher/delete.php",
         data: form.serialize(),
         success(data) {
           console.log(data);
@@ -39,7 +43,7 @@ function AuthorCom(props) {
       });
       alert("Change complete!!");
       setSubmitting(false);
-      window.location.href = link.client_link + "author/list";
+      window.location.reload();
     }, 2000);
   };
 
@@ -48,12 +52,13 @@ function AuthorCom(props) {
       <tr>
         <td>{props.id}</td>
         <td>{props.name}</td>
-        <td>{props.address}</td>
-        <td>{props.phone}</td>
-        <td>{props.specialization}</td>
+        <td>{props.threshold}</td>
+        <td>{props.number_thres}</td>
+        <td>{props.discount}</td>
+        <td>{props.discount_rate}</td>
         <td>
           {!deleting && (
-            <NavLink href={link.client_link + "author/edit?author_id=" + props.id} >
+            <NavLink href={link.client_link + "voucher/edit?voucher_id=" + props.id} >
               <button
                 type="button"
                 class="btn btn-success"
@@ -67,11 +72,9 @@ function AuthorCom(props) {
           )}
 
           <form
-            action={link.server_link + "controller/author/delete.php"}
+            action={link.server_link + "controller/voucher/delete.php"}
             method="post"
-            onSubmit={(event) => {
-              handleSubmitM(event);
-            }}
+            onSubmit={(e) => handleSubmitM(e)}
           >
             <input type="hidden" name="id" id="id" value={props.id} />
             <input
@@ -128,4 +131,4 @@ function AuthorCom(props) {
   );
 }
 
-export default AuthorCom;
+export default VoucherCom;

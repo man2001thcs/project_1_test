@@ -9,6 +9,15 @@ import $ from "jquery";
 import link from "../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import InputLabel from "@mui/material/InputLabel";
+import { Button } from "@mui/material";
+import { ActionTypes } from "@mui/base";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+
 let PageSize = 6;
 
 function CartView(props) {
@@ -21,15 +30,19 @@ function CartView(props) {
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
 
+  const [voucherPrice, setVoucher] = useState([]);
   const search = useLocation().search;
   const success = new URLSearchParams(search).get("success");
+  const [listState3, setListState3] = useState();
+
+  const [voucherChoose, setVChoose] = useState(0);
 
   if (success) {
     localStorage.setItem("cart", []);
   }
 
   const [address, setAddress] = useState(props.address ?? "");
-  console.log(address);
+  //console.log(tempCart);
 
   useEffect(() => {
     setAddress(props.address);
@@ -48,10 +61,10 @@ function CartView(props) {
     });
   };
 
-  const urlAuthor = link.server_link +
-    "controller/author/log_session/" +
-    localStorage.getItem("codeLogin") +
-    ".json?timeStamp=" + GenerateRandomCode.NumCode(4);
+  const urlAuthor =
+    link.server_link +
+    "controller/author/log_session/user_author.json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   useEffect(() => {
     const getData = async () => {
@@ -76,21 +89,86 @@ function CartView(props) {
     });
   }, []);
 
+  const urlVoucher =
+    link.voucher_link +
+    "user_voucher.json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axios.get(urlVoucher);
+        setListState3(response.data);
+        //console.log(response.data);
+      } catch (err) {
+        setError(err.message);
+        setListState3(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch(urlVoucher, {
+      method: "HEAD",
+    }).then((res) => {
+      if (res.ok) {
+        getData();
+      } else {
+      }
+    });
+  }, []);
+
   const totalPrice = tempCart?.reduce(
-    (total, currentValue) => (total = total + currentValue.total_price),
+    (total, currentValue) =>
+      (total =
+        parseInt(total) +
+        parseInt(currentValue.total_price) * parseFloat(currentValue.rate)),
     0
   );
 
   function find_author(author_id) {
     return listState2?.find((element) => {
-      return element["WpAuthor"].id === author_id;
+      return element?.WpAuthor.id === author_id;
     });
   }
+
+  function find_voucher(voucher_id) {
+    return listState3?.find((element) => {
+      return element?.WpVoucher.id === voucher_id;
+    });
+  }
+
+  //console.log(totalPrice);
+  //console.log(voucherChoose);
 
   useEffect(() => {
     setItemNum(JSON.parse(localStorage.getItem("cart") || "[]")?.length);
     setCart(JSON.parse(localStorage.getItem("cart") || "[]"));
-  }, [localStorage.getItem("cart")]);
+
+    tempCart?.map((item, index) => {
+      var temp = voucherPrice;
+      //var temp2 = JSON.parse(item.discount || "[]");
+      var temp2 = item.discount;
+      //console.log(temp2);
+      //temp = temp.concat(temp2.filter((item) => temp.indexOf(item) < 0));
+      //setVoucher(temp);
+      //console.log(item);
+    });
+  }, []);
+
+  useEffect(() => {
+    var temp = [];
+    tempCart?.map((item, index) => {
+
+      
+      var b = item.discount?.split(";").filter((item) => item !== "");
+      console.log(b);
+      temp = temp.concat(b.filter((item) => temp.indexOf(item) === -1));
+      setVoucher(temp);
+
+      //console.log(temp.indexOf('3'));
+      console.log(voucherPrice);
+    });
+  }, [listState3]);
 
   function empty_cart() {
     if (tempCart?.length === 0 || success)
@@ -120,56 +198,118 @@ function CartView(props) {
           price={item.price}
           number={item.number}
           totalPrice={item.total_price}
+          rate={item.rate}
+          discount={item.discount}
         ></CartViewCom>
       </div>
     );
   });
+
+  const itemmap2 = voucherPrice?.map((item, index) => {
+    var voucher = listState3?.find((element) => {
+      return element.WpVoucher.id === item;
+    });
+    if (
+      parseInt(totalPrice) >= parseInt(voucher?.WpVoucher.threshold) &&
+      parseInt(voucher?.WpVoucher.threshold) > 0
+    ) {
+      return (
+        <MenuItem value={voucher?.WpVoucher.id} disabled={(totalPrice > voucher?.WpVoucher.threshold) ? false : true}>
+          {voucher?.WpVoucher.name}: Get -{voucher?.WpVoucher.discount}đ on{" "}
+          {voucher?.WpVoucher.threshold}đ order
+        </MenuItem>
+      );
+    }
+  });
   return (
     <main>
-      <div className="basket">
-        <div className="basket-labels">
-          <ul>
-            <li className="item item-heading">
-              <strong>Product</strong>
-            </li>
-            <li className="name">
-              <strong>Name</strong>
-            </li>
-            <li className="price">
-              <strong>Product single price</strong>
-            </li>
-            <li className="quantity">
-              <strong>Number</strong>
-            </li>
-            <li className="subtotal">
-              <strong>Total price (each product)</strong>
-            </li>
-          </ul>
-        </div>
+      <form
+        action={link.server_link + "controller/cart/create.php"}
+        method="post"
+      >
+        <div className="basket">
+          <div className="basket-module">
+            <InputLabel id="demo-simple-select-label">Voucher</InputLabel>
+            <Select
+              labelId="voucher_id"
+              id="voucher_id"
+              name="voucher_id"
+              fullWidth
+              value={voucherChoose}
+              label="Voucher"
+              defaultValue={0}
+              onChange={(event) => {
+                setVChoose(event.target.value);
+              }}
+              placeholder={"--Choose--"}
+            >
+              <MenuItem value={0}>--NONE--</MenuItem>
+              {itemmap2}
+            </Select>
+          </div>
+          <div className="basket-labels">
+            <ul>
+              <li className="item item-heading">
+                <strong>Product</strong>
+              </li>
+              <li className="name">
+                <strong>Name</strong>
+              </li>
+              <li className="price">
+                <strong>Product single price</strong>
+              </li>
+              <li className="quantity">
+                <strong>Number</strong>
+              </li>
+              <li className="subtotal">
+                <strong>Total price (each product)</strong>
+              </li>
+            </ul>
+          </div>
 
-        {itemmap1}
-        {empty_cart()}
-      </div>
-      <aside>
-        <div className="summary">
-          <div className="summary-total-items">
-            <span className="total-items" /> Items: {itemsNum}
-            <a href="../../main_page/main/list.php" style={{marginLeft: '15px'}}>Turn back</a>
-          </div>
-          <div className="summary-subtotal">
-            <div className="subtotal-title">Total price:</div>
-            <div className="subtotal-value final-value" id="basket-subtotal">
-              {totalPrice}
+          {itemmap1}
+          {empty_cart()}
+        </div>
+        <aside>
+          <div className="summary">
+            <div className="summary-total-items">
+              <span className="total-items" /> Items: {itemsNum}
+              <a
+                href="../../main_page/main/list.php"
+                style={{ marginLeft: "15px" }}
+              >
+                Turn back
+              </a>
             </div>
-            <div className="summary-promo hide">
-              <div className="promo-title">Promotion</div>
-              <div className="promo-value final-value" id="basket-promo" />
+            <div className="summary-subtotal">
+              <div className="subtotal-title">Total price:</div>
+              <div className="subtotal-value final-value" id="basket-subtotal">
+                {totalPrice -
+                  parseInt(
+                    find_voucher(voucherChoose)?.WpVoucher.discount ?? 0
+                  ) ?? 0}{" "}
+                {voucherChoose > 0 && (
+                  <span
+                    style={{
+                      fontStyle: "italic",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    (Discount{" "}
+                    {parseInt(
+                      find_voucher(voucherChoose)?.WpVoucher.discount
+                    ) ?? 0}
+                    đ)
+                  </span>
+                )}
+              </div>
+              <div className="summary-promo hide">
+                <div className="promo-title">Promotion</div>
+                <div className="promo-value final-value" id="basket-promo" />
+              </div>
             </div>
-          </div>
-          <form
-            action={link.server_link + "controller/cart/create.php"}
-            method="post"
-          >
+
             <div className="basket-module">
               <label htmlFor="promo-address">Address: </label>
               <input
@@ -195,15 +335,18 @@ function CartView(props) {
             <div className="summary-total">
               <div className="total-title">Total price</div>
               <div className="total-value final-value" id="basket-total">
-                {totalPrice}
+                {totalPrice -
+                  parseInt(
+                    find_voucher(voucherChoose)?.WpVoucher.discount ?? 0
+                  ) ?? 0}
               </div>
             </div>
             <div className="summary-checkout">
-            <input
+              <input
                 type="hidden"
                 name="emailS"
                 id="emailS"
-                Value={localStorage.getItem('email')}
+                Value={localStorage.getItem("email")}
               />
               <input
                 type="hidden"
@@ -239,9 +382,9 @@ function CartView(props) {
                 Complete transaction
               </button>
             </div>
-          </form>
-        </div>
-      </aside>
+          </div>
+        </aside>
+      </form>
     </main>
   );
 }
