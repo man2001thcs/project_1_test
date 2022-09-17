@@ -15,16 +15,15 @@ function BuyLogList(props) {
   const urlReceive =
     link.receive_link +
     localStorage.getItem("codeLogin") +
-    ".json?timeStamp=" + GenerateRandomCode.NumCode(4);
+    ".json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
-    console.log(urlReceive);
+  console.log(urlReceive);
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(
-          urlReceive
-        );
+        const response = await axios.get(urlReceive);
         setListState(response.data);
         //console.log(response.data);
       } catch (err) {
@@ -69,33 +68,51 @@ function BuyLogList(props) {
         address={item?.WpReceive.address}
         transport={item?.WpReceive.transport}
         state={item?.WpReceive.state}
+        description={item?.WpReceive.description}
       ></BuyLogCom>
     )
   );
+
+  function empty_buylog() {
+    if (listState?.length === 0) {
+      return (
+        <tbody>
+          <tr>
+            <td>No item available</td>
+          </tr>
+        </tbody>
+      );
+    }
+  }
 
   return (
     <div>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title" style={{fontSize: "20px", fontWeight: "bold"}}>Buy log list</h3>
+          <h3
+            class="panel-title"
+            style={{ fontSize: "20px", fontWeight: "bold" }}
+          >
+            Buy log list
+          </h3>
         </div>
         <div class="panel-body">
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>User id</th>
                 <th>Created</th>
                 <th>Transport</th>
                 <th>Address</th>
-                <th>Item</th>               
-                <th>Price</th>               
+                <th>Item</th>
+                <th>Price</th>
                 <th>Total price</th>
                 <th>State</th>
+                <th>Message</th>
                 <th></th>
               </tr>
             </thead>
             {itemmap1}
+            {empty_buylog()}
           </table>
 
           <Pagination

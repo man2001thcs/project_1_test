@@ -1,166 +1,296 @@
 import "bootstrap";
 import { useState } from "react";
-import "../../../css/logout.css";
+import "../../../css/sign_in.css";
 import $ from "jquery";
-import Header from "../../element/header";
 import * as Yup from "yup";
 import { useEffect } from "react";
 import link from "../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
 import { useLocation } from "react-router-dom";
 
-function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
-  const search = useLocation().search;
-  const sign = new URLSearchParams(search).get("sign");
+import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
+import { Button } from "@mui/material";
+import Alert from "@mui/material/Alert";
 
+function SignIn() {
   const [result, setResult] = useState("");
 
-  const codeLogin = GenerateRandomCode.TextCode(4);
+  const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
+  // const codeLogin = GenerateRandomCode.TextCode(8);
 
   const SignupSchema = Yup.object().shape({
     emailS: Yup.string().email("Invalid email").required("Required"),
     passwordS: Yup.string()
-      .matches(phoneRegExp, "Password is not valid")
       .min(2, "Too Short!")
       .max(70, "Too Long!")
-      .required("Required name!!"),
+      .required("Required password!!"),
     re_passwordS: Yup.string()
       .oneOf([Yup.ref("passwordS"), null], "Passwords don't match!")
-      .matches(phoneRegExp, "Password is not valid")
+      .min(2, "Too Short!")
+      .max(70, "Too Long!")
+      .required("Required password!!"),
+    fullname: Yup.string()
       .min(2, "Too Short!")
       .max(70, "Too Long!")
       .required("Required name!!"),
+    address: Yup.string()
+      .min(2, "Too Short!")
+      .max(100, "Too Long!")
+      .required("Required address!!"),
+    phone_number: Yup.number("Invalid number!!").required("Required number!!"),
   });
 
-  useEffect(() => {
-    // storing input name
-    localStorage.setItem("email", "");
-    localStorage.setItem("password", "");
-    localStorage.setItem("login_code", "");
-    localStorage.setItem("cart", []);
-  }, []);
-
-  const handleSumbit = (e) => {
-    e.preventDefault();
-    const form = $(e.target);
+  const handleSubmit = (values) => {
     $.ajax({
       type: "POST",
-      url: form.attr("action"),
-      data: form.serialize(),
+      url: link.server_link + "controller/user/sign_in.php",
+      data: values,
       success(data) {
+        console.log(data);
         setResult(data);
       },
     });
   };
+
+  const formik = useFormik({
+    initialValues: {
+      emailS: "",
+      passwordS: "",
+      re_passwordS: "",
+      fullname: "",
+      phone_number: "",
+      address: "",
+      codeS: GenerateRandomCode.TextCode(8),
+    },
+    validationSchema: SignupSchema,
+    onSubmit: (values, actions) => {
+      if (formik.values.passwordS === formik.values.re_passwordS) {
+        //console.log(values);
+        localStorage.setItem("email", formik.values.emailS);
+        localStorage.setItem("password", formik.values.passwordS);
+        localStorage.setItem("codeLogin", formik.values.codeS);
+        localStorage.setItem("cart", []);
+        setTimeout(() => {
+          //console.log(values);
+          handleSubmit(values);
+          actions.setSubmitting(false);
+          actions.resetForm({
+            values: {
+              // the type of `values` inferred to be Blog
+              passwordS: "",
+              re_passwordS: "",
+            },
+
+            // you can also set the other form states here
+          });
+
+          //alert("Register complete!!");
+          //window.location.href = link.client_link + "login";
+        }, 500);
+      } else {
+        alert("Register failed!!");
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Register complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "login";
+    }
+  }, [result]);
+
   return (
     <div className="container">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h1 class="panel-title">Sign in</h1>
-        </div>
-        <div class="panel-body">
+      <form method="post" onSubmit={formik.handleSubmit}>
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "10px",
+            padding: "20px 30px 20px",
+          }}
+        >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              marginBottom: "20px",
+            }}
+          >
+            <i class="fa fa-id-card"></i> Register{" "}
+          </h2>
+
           <div class="row">
-            <div
-              class="col-xs-8 col-sm-8 col-md-8 col-lg-8"
-              style={{ backgroundColor: "#303134" }}
-            >
-              <div class="page-header">
-                {(parseInt(sign) !== 1 && parseInt(sign) !== 2 && parseInt(sign) !== 3) &&(
-                  <h3 style={{ color: "white" }}>Please register</h3>
-                )}
-                
-                {parseInt(sign) === 2 && (
-                  <h3 style={{ color: "white" }}>
-                    Account has already existed
-                  </h3>
-                )}
-                {parseInt(sign) === 3 && (
-                  <h3 style={{ color: "white" }}>
-                    Registation failed. Please try again
-                  </h3>
-                )}
-              </div>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+              <InputLabel style={{ fontSize: 14, fontWeight: "bold" }}>
+                Email
+              </InputLabel>
+              <TextField
+                name="emailS"
+                placeholder="Email"
+                className="form-control"
+                type="text"
+                variant="outlined"
+                value={formik.values.emailS}
+                inputProps={{ style: { fontSize: 14, color: "black" } }}
+                style={{ marginBottom: "40px" }}
+                onChange={formik.handleChange}
+                error={formik.touched?.emailS && Boolean(formik.errors?.emailS)}
+                helperText={formik.touched?.emailS && formik.errors?.emailS}
+              />
             </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+              <InputLabel style={{ fontSize: 14, fontWeight: "bold" }}>
+                Password
+              </InputLabel>
+              <TextField
+                name="passwordS"
+                placeholder="Password"
+                className="form-control"
+                type="password"
+                variant="outlined"
+                inputProps={{ style: { fontSize: 14, color: "black" } }}
+                value={formik.values.passwordS}
+                style={{ marginBottom: "40px" }}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched?.passwordS && Boolean(formik.errors?.passwordS)
+                }
+                helperText={
+                  formik.touched?.passwordS && formik.errors?.passwordS
+                }
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+              <InputLabel style={{ fontSize: 14, fontWeight: "bold" }}>
+                Re-enter Password
+              </InputLabel>
+              <TextField
+                name="re_passwordS"
+                placeholder="Re-enter password"
+                className="form-control"
+                type="password"
+                variant="outlined"
+                inputProps={{ style: { fontSize: 14, color: "black" } }}
+                value={formik.values.re_passwordS}
+                style={{ marginBottom: "40px" }}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched?.re_passwordS &&
+                  Boolean(formik.errors?.re_passwordS)
+                }
+                helperText={
+                  formik.touched?.re_passwordS && formik.errors?.re_passwordS
+                }
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+              <InputLabel style={{ fontSize: 14, fontWeight: "bold" }}>
+                Full name
+              </InputLabel>
+              <TextField
+                name="fullname"
+                placeholder="Full name"
+                className="form-control"
+                type="text"
+                variant="outlined"
+                inputProps={{ style: { fontSize: 14, color: "black" } }}
+                value={formik.values.fullname}
+                style={{ marginBottom: "40px" }}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched?.fullname && Boolean(formik.errors?.fullname)
+                }
+                helperText={formik.touched?.fullname && formik.errors?.fullname}
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+              <InputLabel style={{ fontSize: 14, fontWeight: "bold" }}>
+                Phone number
+              </InputLabel>
+              <TextField
+                name="phone_number"
+                placeholder="Phone"
+                className="form-control"
+                type="text"
+                variant="outlined"
+                inputProps={{ style: { fontSize: 14, color: "black" } }}
+                value={formik.values.phone_number}
+                style={{ marginBottom: "40px" }}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched?.phone_number &&
+                  Boolean(formik.errors?.phone_number)
+                }
+                helperText={
+                  formik.touched?.phone_number && formik.errors?.phone_number
+                }
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+              <InputLabel style={{ fontSize: 14, fontWeight: "bold" }}>
+                Address
+              </InputLabel>
+              <TextField
+                name="address"
+                placeholder="Address"
+                className="form-control"
+                type="text"
+                variant="outlined"
+                inputProps={{ style: { fontSize: 14, color: "black" } }}
+                value={formik.values.address}
+                style={{ marginBottom: "40px" }}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched?.address && Boolean(formik.errors?.address)
+                }
+                helperText={formik.touched?.address && formik.errors?.address}
+              />
+            </div>
+          </div>
+
+          <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="login">
-                <div className="form">
-                  <Formik
-                    initialValues={{
-                      emailS: "",
-                      passwordS: "",
-                      re_passwordS: "",
-                      fullname: "",
-                      address: "",
-                      phone_number: "",
-                    }}
-                    validationSchema={SignupSchema}
-                    onSubmit={(event) => {
-                      handleSumbit(event);
-                    }}
-                  >
-                    {({ errors, touched }) => (
-                      <form
-                        action={
-                          link.server_link + "controller/user/sign_in.php"
-                        }
-                        method="post"
-                      >
-                        <h2>Sign in</h2>
-                        <Field
-                          name="emailS"
-                          placeholder="Email"
-                          className="form-control"
-                          type="text"
-                        />
-                        <Field
-                          name="passwordS"
-                          placeholder="Password"
-                          className="form-control"
-                          type="password"
-                        />
-                        <Field
-                          name="re_passwordS"
-                          placeholder="Re-enter Password"
-                          className="form-control"
-                          type="password"
-                        />
-                        <Field
-                          name="fullname"
-                          placeholder="Name"
-                          className="form-control"
-                          type="text"
-                        />
-                        <Field
-                          name="address"
-                          placeholder="Address"
-                          className="form-control"
-                          type="text"
-                        />
-                        <Field
-                          name="phone_number"
-                          placeholder="Phone number"
-                          className="form-control"
-                          type="text"
-                        />
-                        <input
-                          type="submit"
-                          Value="Sign In"
-                          className="login_button"
-                        />
-                        <p></p>
-                      </form>
-                    )}
-                  </Formik>
-                </div>
+              {parseInt(result) === 0 && (
+                <Alert severity="error" style={{ marginBottom: "20px" }}>
+                  Register failed, account existed
+                </Alert>
+              )}
+              <div className="form-group">
+                <Button
+                  type="submit"
+                  style={{ fontSize: 14, fontWeight: "bold" }}
+                  className="btn btn-primary"
+                  disabled={formik.isSubmitting}
+                  color="primary"
+                  variant="contained"
+                  fullWidth
+                >
+                  {formik.isSubmitting ? "Please wait..." : "Submit"}
+                </Button>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -66,6 +66,7 @@ function BuyLogList(props) {
         address={item?.WpReceive.address}
         transport={item?.WpReceive.transport}
         state={item?.WpReceive.state}
+        description={item?.WpReceive.description}
       ></BuyLogCom>
     )
   );
@@ -84,11 +85,12 @@ function BuyLogList(props) {
                 <th>User id</th>
                 <th>Created</th>
                 <th>Transport</th>
-                <th>Address</th>
+                <th>Address</th>               
                 <th>Item</th>               
                 <th>Price</th>               
-                <th>Total price</th>
+                <th>Total price</th>              
                 <th>State</th>
+                <th>Message</th>
                 <th></th>
               </tr>
             </thead>

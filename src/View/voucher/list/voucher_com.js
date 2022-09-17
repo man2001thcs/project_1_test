@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "bootstrap";
 import { NavLink } from "reactstrap";
 import link from "../../../config/const";
@@ -41,11 +41,20 @@ function VoucherCom(props) {
           setResult(data);
         },
       });
-      alert("Change complete!!");
+      //alert("Change complete!!");
       setSubmitting(false);
-      window.location.reload();
+      //window.location.reload();
     }, 2000);
   };
+
+  
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Change complete!!");
+      setResult("-1");
+      window.location.reload();
+    }
+  }, [result]);
 
   return (
     <tbody>

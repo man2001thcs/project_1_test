@@ -2,8 +2,7 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
 import $ from "jquery";
-import bootstrap from "bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import link from "../../../config/const";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
@@ -13,6 +12,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
+import Alert from "@mui/material/Alert";
 
 function InputVoucher() {
   const [result, setResult] = useState("");
@@ -74,13 +74,23 @@ function InputVoucher() {
             number_thres: "",
             discount: "",
             discount_rate: "",
+            emailS: localStorage.getItem("email"),
+            codeS: localStorage.getItem("codeLogin"),
           },
           // you can also set the other form states here
         });
-        alert("Insert complete!!");
+        //alert("Insert complete!!");
       }, 2000);
     },
   });
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Insert complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "voucher/list";
+    }
+  }, [result]);
 
   return (
     <div>
@@ -148,7 +158,9 @@ function InputVoucher() {
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
               <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Threshold number</InputLabel>
+                <InputLabel style={{ fontSize: 12 }}>
+                  Threshold number
+                </InputLabel>
                 <TextField
                   name="number_thres"
                   className="form-control"
@@ -216,6 +228,11 @@ function InputVoucher() {
 
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              {parseInt(result) === 0 && (
+                <Alert severity="error" style={{ marginBottom: "20px" }}>
+                  Insert failed
+                </Alert>
+              )}
               <div className="form-group">
                 <TextField
                   type="hidden"

@@ -132,15 +132,13 @@ class AppModel
 		return $data;
 	}
 
-	//find user by name
-	public function findUserByName($name) {
-		$temp = "LIKE '%";
-		$temp .= $name."%'";
+	//find author/user by name
+	public function findByName($name) {
 		$data = $this->find(array(
-			'coditions' => array($this->alias.'.name' => $temp)
-		), 'all');
-		$this->form->data = $data;
-		return $data;
+			'conditions' => array($this->alias.'.name' => $name)
+		), 'first');
+		//echo json_encode($data);
+		return $data[$this->alias]['id'];
 	}
 
 	//find user by id

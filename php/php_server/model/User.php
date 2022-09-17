@@ -109,15 +109,15 @@ class User extends AppModel {
 		), 'first');
 
 		if (!empty($exists)) {
-			echo 1;
-			$account =  "tk_" . $data[$this->alias]['email'];
-			$code = $this->session->read(strval($account));
-			if (isset($code)){
-				$code = $this->session->read(strval($account)); 
-				$this->session->delete(strval($account));
-				unlink("../controller/user/log_session/" . $code . ".json");
+			$code = $exists[$this->alias]['code_login'];
+			if (isset($code) || $code != ""){
+				if (file_exists("../controller/user/log_session/" . $code . ".json")){
+					unlink("../controller/user/log_session/" . $code . ".json");
+				}
+				
 			}
-			$this->session->write(strval($account), $data[$this->alias]['codeLogin']);
+			$exists[$this->alias]['code_login'] = $data[$this->alias]['code_login'];
+			parent::save($exists);
 			
 			return true;
 		}		
@@ -155,14 +155,26 @@ class User extends AppModel {
 	}
 		
 	public function logout($account) {
-		$account = 'tk_' . $account;
-		$this->session->delete($account);
-		return true;
+		$exists = $this->find(array(
+			'conditions' => array(
+				'email' => $account
+			)
+		), 'first');
+
+		$exists['User']['code_login'] = "";
+
+		if (parent::save($exists)){
+			return true;
+		};			
 	}
 
 	public function login_code($account) {
-		$account = 'tk_' . $account;
-		return $this->session->read($account);
+		$exists = $this->find(array(
+			'conditions' => array(
+				'email' => $account			
+			)
+		), 'first');
+		return $exists['User']['code_login'];
 	}
 
 	public function is_admin($email) {		
@@ -178,7 +190,17 @@ class User extends AppModel {
 	public function welcome($email) {
 		$exists = $this->find(array(
 			'fields' => array($this->alias . '.id', $this->alias . '.fullname', $this->alias . '.address',
-			 $this->alias . '.phone_number', $this->alias . '.is_admin'),	
+			 $this->alias . '.phone_number', $this->alias . '.is_admin', $this->alias . '.code_login', $this->alias . '.created'),	
+			'conditions' => array(
+				'email' => $email			
+			)
+		), 'first');			
+		return $exists['User'];
+	}
+
+	public function get_pass($email) {
+		$exists = $this->find(array(
+			'fields' => array($this->alias . '.password'),	
 			'conditions' => array(
 				'email' => $email			
 			)

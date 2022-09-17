@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "bootstrap";
 import { NavLink } from "reactstrap";
 import link from "../../../config/const";
@@ -37,11 +37,19 @@ function AuthorCom(props) {
           setResult(data);
         },
       });
-      alert("Change complete!!");
+      //alert("Change complete!!");
       setSubmitting(false);
-      window.location.href = link.client_link + "author/list";
+      //window.location.href = link.client_link + "author/list";
     }, 2000);
   };
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Change complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "author/list";
+    }
+  }, [result]);
 
   return (
     <tbody>

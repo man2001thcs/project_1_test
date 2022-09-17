@@ -31,13 +31,14 @@ if (isset($_POST)) {
 	);
 	if (strcmp($user->login_code($_POST['emailS']), $_POST['codeS']) == 0  && $user->is_admin($_POST['emailS'])){
 		if ($author->save($dataSub)) {
-			$link = 'user_author.json';
-			$linkc = './log_session/'.$link;	
-			//file_put_contents($link, (json_encode (new stdClass)));
-			unlink($link);
-			header('Location: http://localhost/php_server/controller/author/list.php?email=' . $_POST['emailS']);
+			$linku = './log_session/user_author.json';
+			$resultS = $author->findAll();
+			file_put_contents($linku, json_encode($resultS));
+			echo 1;	
+			//header('Location: ' . CLIENT_URL . 'author/list');
 		} else {
-			header('Location: ' . CLIENT_URL . 'author/list?author_id=' . $id . '&success=0');
+			echo 0;	
+			//header('Location: ' . CLIENT_URL . 'author/list?author_id=' . $id . '&success=0');
 		}
 	}	
 }

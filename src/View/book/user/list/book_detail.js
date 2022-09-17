@@ -150,51 +150,54 @@ function BookDes(props) {
       );
   });
 
-  const itemmap2 = book?.WpBook.voucher_id?.split(";")?.filter(item => item !== "").map((item, index) => {
-    var voucher = find_voucher(item);
-    return (
-      <div>
-        {voucher?.WpVoucher.name.indexOf("DISCOUNT") !== -1 && (
-          <span
-            style={{
-              display: "inline",
-              backgroundColor: "#FBEBED",
-              padding: "5px 6px 5px",
-              color: "#EE4F2F",
-            }}
-            title={
-              "Buy more than " +
-              voucher?.WpVoucher.number_thres +
-              " items, get " +
-              voucher?.WpVoucher.discount_rate +
-              " discount per item"
-            }
-          >
-            {voucher?.WpVoucher.name}
-          </span>
-        )}
-        {voucher?.WpVoucher.name.indexOf("PRICE") !== -1 && (
-          <span
-            style={{
-              display: "inline",
-              backgroundColor: "#FBEBED",
-              padding: "5px 6px 5px",
-              color: "#EE4F2F",
-            }}
-            title={
-              " Get " +
-              voucher?.WpVoucher.discount +
-              " discount (Only when total price reach " +
-              voucher?.WpVoucher.threshold +
-              " discount per item"
-            }
-          >
-            {voucher?.WpVoucher.name}
-          </span>
-        )}
-      </div>
-    );
-  });
+  const itemmap2 = book?.WpBook.voucher_id
+    ?.split(";")
+    ?.filter((item) => item !== "")
+    .map((item, index) => {
+      var voucher = find_voucher(item);
+      return (
+        <div>
+          {voucher?.WpVoucher.name.indexOf("DISCOUNT") !== -1 && (
+            <span
+              style={{
+                display: "inline",
+                backgroundColor: "#FBEBED",
+                padding: "5px 6px 5px",
+                color: "#EE4F2F",
+              }}
+              title={
+                "Buy more than " +
+                voucher?.WpVoucher.number_thres +
+                " items, get " +
+                voucher?.WpVoucher.discount_rate +
+                " discount per item"
+              }
+            >
+              {voucher?.WpVoucher.name}
+            </span>
+          )}
+          {voucher?.WpVoucher.name.indexOf("PRICE") !== -1 && (
+            <span
+              style={{
+                display: "inline",
+                backgroundColor: "#FBEBED",
+                padding: "5px 6px 5px",
+                color: "#EE4F2F",
+              }}
+              title={
+                " Get " +
+                voucher?.WpVoucher.discount +
+                " discount (Only when total price reach " +
+                voucher?.WpVoucher.threshold +
+                " discount per item"
+              }
+            >
+              {voucher?.WpVoucher.name}
+            </span>
+          )}
+        </div>
+      );
+    });
 
   function remain(book) {
     if (parseInt(book?.WpBook.remain_number) > 0) {
@@ -216,18 +219,21 @@ function BookDes(props) {
   };
 
   useEffect(() => {
-    book?.WpBook.voucher_id?.split(";")?.filter(item => item !== "").map((item, index) => {
-      var voucher = listState3?.find((element) => {
-        return element.WpVoucher.id === item;
+    book?.WpBook.voucher_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        var voucher = listState3?.find((element) => {
+          return element.WpVoucher.id === item;
+        });
+        if (voucher?.WpVoucher.name.indexOf("DISCOUNT") !== -1) {
+          setDiscount_id(voucher?.WpVoucher.id);
+          setItemN(voucher?.WpVoucher.number_thres);
+          setDiscount(voucher?.WpVoucher.discount_rate);
+          console.log(item_n);
+          console.log(discount_rate);
+        }
       });
-      if (voucher?.WpVoucher.name.indexOf("DISCOUNT") !== -1) {
-        setDiscount_id(voucher?.WpVoucher.id);
-        setItemN(voucher?.WpVoucher.number_thres);
-        setDiscount(voucher?.WpVoucher.discount_rate);
-        console.log(item_n);
-        console.log(discount_rate);
-      }
-    });
   }, [listState3, valueNumber]);
 
   const addCart = () => {
@@ -246,7 +252,7 @@ function BookDes(props) {
             ? 1 - parseFloat(discount_rate)
             : 1,
         discount: book?.WpBook.voucher_id,
-        item_discount_id: discount_id
+        item_discount_id: discount_id,
       };
 
       var temp = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -255,8 +261,9 @@ function BookDes(props) {
       //localStorage.removeItem("cart");
 
       alert("Add success!!");
+      window.location.href = link.client_link + "home";
 
-      console.log(JSON.parse(localStorage.getItem("cart") || "[]"));
+      //console.log(JSON.parse(localStorage.getItem("cart") || "[]"));
     } else alert("Add failed!!");
   };
 
@@ -378,7 +385,7 @@ function BookDes(props) {
           >
             <div className="description">
               <h2>Book name</h2>
-              <p style={{ fontWeight: "bold" }}>{book?.WpBook.name}</p>
+              <p>{book?.WpBook.name}</p>
             </div>
             <div className="description">
               <h2>Author</h2>
@@ -391,6 +398,18 @@ function BookDes(props) {
             <div className="description">
               <h2>Voucher</h2>
               {itemmap2}
+              {(book?.WpBook.voucher_id === null ||
+                book?.WpBook.voucher_id === "") && (
+                <span
+                  style={{
+                    display: "inline",
+                    padding: "5px 6px 5px",
+                    fontStyle: 'italic'
+                  }}
+                >
+                  None
+                </span>
+              )}
             </div>
             <div className="description">
               <h2>Status</h2>
@@ -440,6 +459,7 @@ function BookDes(props) {
                   type="button"
                   className="active"
                   name="buy_button"
+                  disabled={!(parseInt(book?.WpBook.remain_number) > 0)}
                   id="buy_button"
                   onClick={() => addCart()}
                 >

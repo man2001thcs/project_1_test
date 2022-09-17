@@ -16,6 +16,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
 import { ActionTypes } from "@mui/base";
+import Alert from "@mui/material/Alert";
 
 function EditPassword(props) {
   const [result, setResult] = useState("");
@@ -85,11 +86,18 @@ function EditPassword(props) {
           // you can also set the other form states here
         });
 
-        alert("Change complete!!");
-        window.location.href = link.client_link + "home";
+        //alert("Change complete!!");
       }, 2000);
     },
   });
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Change complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "home";
+    }
+  }, [result]);
 
   return (
     <div className="container">
@@ -110,19 +118,6 @@ function EditPassword(props) {
           >
             <i class="fa fa-id-card"></i> Change info{" "}
           </h2>
-
-          {parseInt(result) === 0 && (
-            <h3
-              style={{
-                fontSize: "24px",
-                marginBottom: "20px",
-                color: "red",
-                fontStyle: "italic",
-              }}
-            >
-              Change failed
-            </h3>
-          )}
 
           <div class="row">
             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -202,6 +197,11 @@ function EditPassword(props) {
 
           <div class="row">
             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            {parseInt(result) === 0 && (
+                <Alert severity="error" style={{ marginBottom: "20px" }}>
+                  Change failed
+                </Alert>
+              )}
               <div className="form-group">
                 <Button
                   type="submit"

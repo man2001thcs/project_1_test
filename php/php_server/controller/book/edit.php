@@ -3,7 +3,9 @@ require_once '../../config/const.php';
 require_once '../../config/database.php';
 require_once '../../lib/Helper.php';
 require_once '../../model/Book.php';
+require_once '../../model/Author.php';
 require_once '../../model/User.php';
+require_once '../../model/Voucher.php';
 
 if (!isset($user)) {
 	$user = new User();
@@ -14,11 +16,45 @@ if (!isset($user)) {
 //}
 
 $book = new Book();
+$author = new Author();
+$voucher = new Voucher();
 $id = $_POST['id'];
 $this_data = $book->findById($id);
 //echo json_encode($this_data);
 
 if (isset($_POST)) {
+
+	$author_id = ($_POST['author_id']=='') ? $this_data['WpBook']['author_id'] : $_POST['author_id'];
+	//echo $_POST['author_id'];
+
+	if (isset($_POST['author_id']) && ($_POST['author_id'] != null) && ($_POST['author_id'] != "")){
+		$author_name = $author->findByName($author_id);
+	} else {
+		$author_name = $this_data['WpBook']['author_id'];
+	}
+
+	$voucher_string = "";
+
+	if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] != null) && ($_POST['voucher_id'] != "")){
+		$voucher_this = json_decode($_POST['voucher_id'], true);
+
+		//echo json_encode($voucher_this);
+	
+		usort($voucher_this, function($a, $b) {return strcmp($a['WpVoucher']['id'], $b['WpVoucher']['id']);});
+		
+		$voucher_string = "";
+	
+		foreach ($voucher_this as $item){
+			//echo json_encode($item);
+			//echo $item['WpVoucher']['id'];
+			$temp = $voucher_string;
+			$voucher_string = $temp . strval($item['WpVoucher']['id']) . ';';
+		}
+	} else {
+		$voucher_string = $this_data['WpBook']['voucher_id'];
+	}
+
+	
 	$dataSub = array(
 		'WpBook' => array(
 			'id' => $_POST['id'] ?? $this_data['WpBook']['id'],
@@ -31,23 +67,27 @@ if (isset($_POST)) {
 			'description' => $_POST['description'] ?? $this_data['WpBook']['description'],
 			'created' => $this_data['WpBook']['created'],	
 			'modified' => date('Y-m-d H:i:s') ?? $this_data['WpBook']['modified'],
-			'author_id' => $_POST['author_id'] ?? $this_data['WpBook']['author_id']
+			'author_id' =>  $author_name ?? $this_data['WpBook']['author_id'],
+			'voucher_id' => $voucher_string ?? $this_data['WpBook']['voucher_id'],
 			)
 	);
 	//echo json_encode($dataSub);
 	if (strcmp($user->login_code($_POST['emailS']) ?? "", $_POST['codeS']) == 0  && $user->is_admin($_POST['emailS'])){
+
 		if ($book->save($dataSub)) {
-			$link = $_POST['codeS'].'.json';
-			$linkb = './log_session/'.$link;
-			//file_put_contents($link, (json_encode (new stdClass)));
-			header('Location: '. SERVER_URL . 'controller/book/list.php?codeLogin=' . $_POST["codeS"]);
-			
+				$linku = './log_session/user_book.json';
+				$resultU = $book->findAll();
+				file_put_contents($linku, json_encode($resultU));	
+				//header('Location: ' . CLIENT_URL . 'book/list');	
+				echo 1;
 		} else {
-			header('Location: ' . CLIENT_URL . 'book/edit?book_id=' . $_POST['id'] . '&success=0');
+			//header('Location: ' . CLIENT_URL . 'book/edit?book_id=' . $_POST['id'] . '&success=0');
+			echo 0;
 		}
 	}	
 	else {
-		header('Location: ' . CLIENT_URL . 'book/edit?book_id=' . $_POST['id'] . '&success=0');
+		//header('Location: ' . CLIENT_URL . 'book/edit?book_id=' . $_POST['id'] . '&success=0');
+		echo 0;
 	}
 	
 }

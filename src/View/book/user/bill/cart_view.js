@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useMemo } from "react";
-import Pagination from "../../../element/Pagination/Pagination";
 import "../../../../css/shop_cart.css";
 import CartViewCom from "./cart_view_com";
 import { useLocation } from "react-router-dom";
@@ -13,10 +11,9 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
-import { Button } from "@mui/material";
-import { ActionTypes } from "@mui/base";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Alert from "@mui/material/Alert";
 
 let PageSize = 6;
 
@@ -32,17 +29,15 @@ function CartView(props) {
 
   const [voucherPrice, setVoucher] = useState([]);
   const search = useLocation().search;
-  const success = new URLSearchParams(search).get("success");
   const [listState3, setListState3] = useState();
 
   const [voucherChoose, setVChoose] = useState(0);
-
-  if (success) {
-    localStorage.setItem("cart", []);
-  }
+  const [isSubmitting, setSubmitting] = useState();
 
   const [address, setAddress] = useState(props.address ?? "");
   //console.log(tempCart);
+
+  //Fetch data session
 
   useEffect(() => {
     setAddress(props.address);
@@ -137,41 +132,8 @@ function CartView(props) {
     });
   }
 
-  //console.log(totalPrice);
-  //console.log(voucherChoose);
-
-  useEffect(() => {
-    setItemNum(JSON.parse(localStorage.getItem("cart") || "[]")?.length);
-    setCart(JSON.parse(localStorage.getItem("cart") || "[]"));
-
-    tempCart?.map((item, index) => {
-      var temp = voucherPrice;
-      //var temp2 = JSON.parse(item.discount || "[]");
-      var temp2 = item.discount;
-      //console.log(temp2);
-      //temp = temp.concat(temp2.filter((item) => temp.indexOf(item) < 0));
-      //setVoucher(temp);
-      //console.log(item);
-    });
-  }, []);
-
-  useEffect(() => {
-    var temp = [];
-    tempCart?.map((item, index) => {
-
-      
-      var b = item.discount?.split(";").filter((item) => item !== "");
-      console.log(b);
-      temp = temp.concat(b.filter((item) => temp.indexOf(item) === -1));
-      setVoucher(temp);
-
-      //console.log(temp.indexOf('3'));
-      console.log(voucherPrice);
-    });
-  }, [listState3]);
-
   function empty_cart() {
-    if (tempCart?.length === 0 || success)
+    if (tempCart?.length === 0)
       return (
         <div className="basket-product">
           <div className="item">
@@ -184,6 +146,59 @@ function CartView(props) {
         </div>
       );
   }
+
+  //console.log(totalPrice);
+  //console.log(voucherChoose);
+
+  useEffect(() => {
+    setItemNum(JSON.parse(localStorage.getItem("cart") || "[]")?.length);
+    setCart(JSON.parse(localStorage.getItem("cart") || "[]"));
+  }, []);
+
+  useEffect(() => {
+    var temp = [];
+    tempCart?.map((item, index) => {
+      if (item.discount !== null && item.discount !== undefined) {
+        var b = item.discount?.split(";").filter((item) => item !== "");
+        //console.log(b);
+        temp = temp.concat(b.filter((item) => temp.indexOf(item) === -1));
+      }
+
+      setVoucher(temp);
+
+      //console.log(temp.indexOf('3'));
+      //console.log(voucherPrice);
+    });
+  }, [listState3]);
+
+  const handleSubmitM = (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setTimeout(() => {
+      const form = $(e.target);
+      $.ajax({
+        type: "POST",
+        url: link.server_link + "controller/cart/create.php",
+        data: form.serialize(),
+        success(data) {
+          console.log(data);
+          setResult(data);
+        },
+      });
+      //alert("Order complete!!");
+      setSubmitting(false);
+      //window.location.href = link.client_link + "buy_log/list";
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (parseInt(result) >= 1) {
+      alert("Order complete!!");
+      setResult("-1");
+      localStorage.setItem("cart", []);
+      window.location.href = link.client_link + "buy_log/list";
+    }
+  }, [result]);
 
   const itemmap1 = tempCart?.map((item, index) => {
     return (
@@ -214,7 +229,10 @@ function CartView(props) {
       parseInt(voucher?.WpVoucher.threshold) > 0
     ) {
       return (
-        <MenuItem value={voucher?.WpVoucher.id} disabled={(totalPrice > voucher?.WpVoucher.threshold) ? false : true}>
+        <MenuItem
+          value={voucher?.WpVoucher.id}
+          disabled={totalPrice > voucher?.WpVoucher.threshold ? false : true}
+        >
           {voucher?.WpVoucher.name}: Get -{voucher?.WpVoucher.discount}đ on{" "}
           {voucher?.WpVoucher.threshold}đ order
         </MenuItem>
@@ -223,12 +241,14 @@ function CartView(props) {
   });
   return (
     <main>
-      <form
-        action={link.server_link + "controller/cart/create.php"}
-        method="post"
-      >
+      <form method="post" onSubmit={(e) => handleSubmitM(e)}>
         <div className="basket">
           <div className="basket-module">
+            {parseInt(result) === 0 && (
+              <Alert severity="error" style={{ marginBottom: "20px" }}>
+                Order failed
+              </Alert>
+            )}
             <InputLabel id="demo-simple-select-label">Voucher</InputLabel>
             <Select
               labelId="voucher_id"
@@ -378,8 +398,13 @@ function CartView(props) {
                 id="total_price_all"
                 Value={totalPrice}
               />
-              <button className="checkout-cta" type="submit" name="pay_button">
-                Complete transaction
+              <button
+                className="checkout-cta"
+                type="submit"
+                name="pay_button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Please wait..." : "Complete transaction"}
               </button>
             </div>
           </div>

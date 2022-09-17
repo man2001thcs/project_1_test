@@ -14,6 +14,7 @@ import {
   Dropdown,
 } from "reactstrap";
 import linkn from "../../config/const";
+import Login from "../user/log/login";
 
 function Header(props) {
   const [toogleBook, settoogleBook] = useState(false);
@@ -26,6 +27,16 @@ function Header(props) {
   const [searchInput, setSearch] = useState("");
   const [urlSearch, setUrlSearch] = useState(linkn.client_link + "home");
 
+  const [openLogin, setOpenLogin] = useState(false);
+
+  const handleClickOpenLogin = () => {
+    setOpenLogin(true);
+  };
+
+  const handleClose = () => {
+    setOpenLogin(false);
+  };
+
   const SignupSchema = Yup.object().shape({
     search_book: Yup.string()
       .matches(/[a-zA-Z]/, "Password can only contain Latin letters.")
@@ -34,6 +45,7 @@ function Header(props) {
       .required("Required name!!"),
   });
 
+  console.log(openLogin);
   //const log = !props.login;
   //const logout = props.login;
   useEffect(() => {
@@ -53,6 +65,7 @@ function Header(props) {
     if (isAdmin === "1") {
       return (
         <div class="container">
+        
           <Nav tabs>
             <NavItem>
               <NavLink href={linkn.client_link} style={{ color: "orange" }}>
@@ -232,13 +245,13 @@ function Header(props) {
 
             <div
               class="col-xs-2 col-sm-2 col-md-2 col-lg-2"
-              style={{ marginTop: "10px" }}
+              style={{ marginTop: "8px" }}
             >
               <div class="row">
                 <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
                   {logout && (
                     <nav>
-                      <ul id="dropmenu_account">
+                      <ul id="dropmenu_account"  style={{ marginTop: "1.2px" }}>
                         <li>
                           <a href={linkn.client_link} style={{fontWeight: 'bold'}}>
                             Account <i class="fa fa-user"></i>
@@ -264,21 +277,11 @@ function Header(props) {
                       </ul>
                     </nav>
                   )}
-                  <NavLink href={linkn.client_link + "login"}>
-                    {log && (
-                      <button
-                        type="button"
-                        class="btn btn-success btn-lg"
-                        style={{
-                          margin: "2px",
-                          fontWeight: "bold",
-                          fontSize: "14px"
-                        }}
-                      >
-                        Login <i class="fa fa-sign-in"></i>
-                      </button>
+                  
+                    {log && (                     
+                      <Login/>
                     )}
-                  </NavLink>
+                  
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
                   <NavLink href={linkn.client_link + "signin"}>

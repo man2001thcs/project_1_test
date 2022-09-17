@@ -2,22 +2,20 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
 import $ from "jquery";
-import bootstrap from "bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import link from "../../../config/const";
 import { useLocation } from "react-router-dom";
 
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
-import { ActionTypes } from "@mui/base";
+import Alert from "@mui/material/Alert";
 
 function InputAuthor() {
   const [result, setResult] = useState("");
   const search = useLocation().search;
   const success = new URLSearchParams(search).get("success");
+  const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
 
   const SignupSchema = Yup.object().shape({
     name: Yup.string()
@@ -27,6 +25,7 @@ function InputAuthor() {
     phone: Yup.number("Enter a valid number").required("Required number!!"),
     address: Yup.string().required("Required address!!"),
     specialization: Yup.string()
+
       .min(2, "Too Short!")
       .required("Required description!!"),
   });
@@ -51,7 +50,7 @@ function InputAuthor() {
       phone: "",
       specialization: "",
       emailS: localStorage.getItem("email"),
-      codeS: localStorage.getItem("codeLogin")
+      codeS: localStorage.getItem("codeLogin"),
     },
     validationSchema: SignupSchema,
     onSubmit: (values, actions) => {
@@ -70,34 +69,45 @@ function InputAuthor() {
 
           // you can also set the other form states here
         });
-        alert("Insert complete!!");
+        //alert("Insert complete!!");
         //window.location.href = link.client_link + "author/list";
       }, 2000);
     },
   });
 
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Insert complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "author/list";
+    }
+  }, [result]);
+
   return (
     <div>
-      <h1>Insert author</h1>
-      {parseInt(success) === 0 && (
-        <h3 style={{ color: "red" }}>Insert failed</h3>
-      )}
-      {parseInt(success) === 1 && (
-        <h3 style={{ color: "green" }}>Insert successed</h3>
-      )}
-
       <form
         action={link.server_link + "controller/author/create.php"}
         method="post"
         onSubmit={formik.handleSubmit}
       >
         <div
+          class="container"
           style={{
             backgroundColor: "white",
             borderRadius: "10px",
-            padding: "30px 30px 30px",
+            padding: "20px 30px 20px",
           }}
         >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              marginBottom: "20px",
+            }}
+          >
+            <i class="fa fa-info-circle"></i> Insert new author{" "}
+          </h2>
+
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
               <div className="form-group">
@@ -180,6 +190,11 @@ function InputAuthor() {
 
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              {parseInt(result) === 0 && (
+                <Alert severity="error" style={{ marginBottom: "20px" }}>
+                  Insert failed
+                </Alert>
+              )}
               <div className="form-group">
                 <Button
                   type="submit"

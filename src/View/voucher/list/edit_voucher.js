@@ -10,11 +10,10 @@ import { useEffect } from "react";
 import link from "../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
+import Alert from "@mui/material/Alert";
 
 function EditVoucher() {
   const [result, setResult] = useState("");
@@ -120,22 +119,19 @@ function EditVoucher() {
           setResult(data);
         },
       });
-      alert("Change complete!!");
+      //alert("Change complete!!");
       setSubmitting(false);
-      window.location.href = link.client_link + "voucher/list";
+      //window.location.href = link.client_link + "voucher/list";
     }, 2000);
   };
 
-  const formik = useFormik({
-    validationSchema: validationSchema,
-    onSubmit: (values, actions) => {
-      setTimeout(() => {
-        handleSubmit(values);
-        actions.setSubmitting(false);
-      }, 2000);
-      alert("complete");
-    },
-  });
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Change complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "voucher/list";
+    }
+  }, [result]);
 
   return (
     <div>
@@ -240,6 +236,11 @@ function EditVoucher() {
 
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              {parseInt(result) === 0 && (
+                <Alert severity="error" style={{ marginBottom: "20px" }}>
+                  Register failed, account existed
+                </Alert>
+              )}
               <div className="form-group">
                 <input
                   type="hidden"

@@ -74,11 +74,19 @@ function BookCom(props) {
           setResult(data);
         },
       });
-      alert("Delete complete!!");
+      //alert("Delete complete!!");
       setSubmitting(false);
-      window.location.reload();
+      //window.location.reload();
     }, 2000);
   };
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Delete complete!!");
+      setResult("-1");
+      window.location.reload();
+    }
+  }, [result]);
 
   return (
     <tbody>

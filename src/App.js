@@ -1,4 +1,5 @@
 import "./css/App.css";
+import "./css/login.css";
 import "../node_modules/bootstrap/dist/js/bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -45,7 +46,8 @@ function App() {
   const urlAccount =
     "http://localhost/php_server/controller/user/log_session/" +
     localStorage.getItem("codeLogin") +
-    ".json?timeStamp=" + GenerateRandomCode.NumCode(4);
+    ".json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
   console.log(urlAccount);
 
   useEffect(() => {
@@ -90,7 +92,10 @@ function App() {
     <div>
       <Header login={logined} isAdmin={loginState?.is_admin} />
 
-      <div class="container" style={{ minHeight: "400px", marginTop: "40px", marginBottom: "40px" }} >
+      <div
+        class="container"
+        style={{ minHeight: "400px", marginTop: "40px", marginBottom: "40px" }}
+      >
         <BrowserRouter>
           <Routes>
             <Route path="/">
@@ -99,38 +104,56 @@ function App() {
               {loginState?.is_admin > 0 && (
                 <Route>
                   <Route path="book/input" element={<InputBook />} />
-                  <Route path="book/edit" element={<EditBook />} /> 
-                  <Route path="book/list" element={<BookList />} />            
+                  <Route path="book/edit" element={<EditBook />} />
+                  <Route path="book/list" element={<BookList />} />
                   <Route path="author/input" element={<InputAuthor />} />
                   <Route path="author/edit" element={<EditAuthor />} />
                   <Route path="author/list" element={<AuthorList />} />
                   <Route path="voucher/input" element={<InputVoucher />} />
                   <Route path="voucher/edit" element={<EditVoucher />} />
                   <Route path="voucher/list" element={<VoucherList />} />
-                  <Route path="buy_log/list" element={<BuyLogList_Admin />} /> 
-                  
+                  <Route path="buy_log/list" element={<BuyLogList_Admin />} />
                 </Route>
               )}
 
-              {loginState?.is_admin !==1 && (
+              {loginState?.is_admin !== 1 && (
                 <Route>
                   <Route path="home" element={<BookListU />} />
                   <Route path="book/user/list" element={<BookListUs />} />
                   <Route path="book/user/detail" element={<BookDes />} />
-                  <Route path="author/user/list" element={<AuthorList />} />       
-                  <Route path="buy_log/list" element={<BuyLogList />} />       
-                  <Route path="user/cart" element={<CartView id={loginState?.id} address={loginState?.address}/>} />     
+                  <Route path="author/user/list" element={<AuthorList />} />
+                  <Route path="buy_log/list" element={<BuyLogList />} />
+                  <Route
+                    path="user/cart"
+                    element={
+                      <CartView
+                        id={loginState?.id}
+                        address={loginState?.address}
+                      />
+                    }
+                  />
                 </Route>
               )}
-
 
               <Route path="login" element={<Login />} />
               <Route path="signin" element={<SignIn />} />
 
               {loginState?.length !== 0 && typeof loginState !== "undefined" && (
                 <Route>
-                  <Route path="user/info" element={<EditUser />} />
-                  <Route path="user/password" element={<EditPassword />} />
+                  <Route
+                    path="user/info"
+                    element={
+                      <EditUser
+                        fullname={loginState?.fullname}
+                        address={loginState?.address}
+                        phone_number={loginState?.phone_number}
+                      />
+                    }
+                  />
+                  <Route
+                    path="user/password"
+                    element={<EditPassword password={localStorage.getItem('password')} />}
+                  />
                 </Route>
               )}
             </Route>

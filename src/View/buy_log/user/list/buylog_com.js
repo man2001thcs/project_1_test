@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import Pagination from "../../../element/Pagination/Pagination";
 import link from "../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
+import $ from "jquery";
 
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -12,19 +13,26 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Alert from "@mui/material/Alert";
+import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
 
 function BuyLogCom(props) {
   const [listState1, setListState1] = useState();
   const [listState2, setListState2] = useState();
+
+  const [result, setResult] = useState("");
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
+  const [isSubmitting, setSubmitting] = useState();
+
   const urlReceive =
     link.buylog_link +
     localStorage.getItem("codeLogin") +
     ".json?timeStamp=" +
     GenerateRandomCode.NumCode(4);
 
-  console.log(props.state);
+  //console.log(props.state);
   useEffect(() => {
     const getData = async () => {
       try {
@@ -53,7 +61,7 @@ function BuyLogCom(props) {
     "user_book.json?timeStamp=" +
     GenerateRandomCode.NumCode(4);
 
-  console.log(props.state);
+  //console.log(props.state);
   useEffect(() => {
     const getData = async () => {
       try {
@@ -87,10 +95,11 @@ function BuyLogCom(props) {
     }
   }
 
-  console.log(new Date().valueOf() - new Date(props.created).valueOf());
-  console.log(new Date(props.created));
-  console.log(new Date());
-  console.log(props.created);
+  //console.log(new Date().valueOf() - new Date(props.created).valueOf());
+  //console.log(new Date(props.created));
+  //console.log(new Date());
+  //console.log(props.created);
+
   function delete_function(state) {
     if (
       state === "0" &&
@@ -100,7 +109,9 @@ function BuyLogCom(props) {
     } else return false;
   }
 
-  console.log(listState1);
+  console.log(delete_function(props.state));
+
+  //console.log(listState1);
 
   const cart = listState1
     ?.filter((item) => item?.WpBuyLog.receive_id === props.id)
@@ -137,11 +148,37 @@ function BuyLogCom(props) {
     setOpen(false);
   };
 
+  const handleSubmitM = (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setTimeout(() => {
+      const form = $(e.target);
+      $.ajax({
+        type: "POST",
+        url: link.server_link + "controller/receive/edit.php",
+        data: form.serialize(),
+        success(data) {
+          console.log(data);
+          setResult(data);
+        },
+      });
+      //alert("Cancel complete!!");
+      setSubmitting(false);
+      //window.location.href = link.client_link + "buy_log/list";
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Cancel complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "buy_log/list";
+    }
+  }, [result]);
+
   return (
     <tbody>
       <tr>
-        <td>{props.id}</td>
-        <td>{props.user_id}</td>
         <td>{props.created}</td>
         <td>{props.transport}</td>
         <td>{props.address}</td>
@@ -149,42 +186,28 @@ function BuyLogCom(props) {
         <td></td>
         <td>{props.total_price}</td>
         {complete_receive(props.state)}
+        <td>{props.description}</td>
         <td>
-          {props.state === "0" && (
-            <form
-              action={link.server_link + "controller/receive/edit.php"}
-              method="post"
+          {delete_function(props.state) && (
+            <button
+              type="button"
+              style={{ backgroundColor: "red", borderColor: "red" }}
+              class="btn btn-success"
+              id="viewButton"
+              name="viewButton"
+              onClick={() => handleClickOpen()}
             >
-              <input type="hidden" name="id" id="id" Value={props.id} />
-              <input
-                type="hidden"
-                name="emailS"
-                id="emailS"
-                Value={localStorage.getItem("email")}
-              />
-              <input
-                type="hidden"
-                name="codeS"
-                id="codeS"
-                Value={localStorage.getItem("codeLogin")}
-              />
-              {delete_function(props.state) && (
-                <button
-                  type="submit"
-                  style={{ backgroundColor: "red", borderColor: "red" }}
-                  class="btn btn-success"
-                  id="viewButton"
-                  name="viewButton"
-                  onClick={() => handleClickOpen()}
-                >
-                  Cancel the order
-                </button>
-              )}
-            </form>
+              Cancel the order
+            </button>
           )}
         </td>
       </tr>
       {cart}
+      {parseInt(result) === 0 && (
+        <Alert severity="error" style={{ marginBottom: "20px" }}>
+          Change failed
+        </Alert>
+      )}
       <div>
         <Dialog
           open={open}
@@ -192,25 +215,24 @@ function BuyLogCom(props) {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle
-            id="alert-dialog-title"
-            style={{ fontSize: "18px", fontWeight: "bold" }}
-          >
-            {"Warning!"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText
-              id="alert-dialog-description"
-              style={{ fontSize: "14px" }}
+          <form method="post" onSubmit={(e) => handleSubmitM(e)}>
+            <DialogTitle
+              id="alert-dialog-title"
+              style={{ fontSize: "18px", fontWeight: "bold" }}
             >
-              Are you sure?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <form
-              action={link.server_link + "controller/receive/edit.php"}
-              method="post"
-            >
+              {"Warning!"}
+            </DialogTitle>
+            <DialogContent>
+              <InputLabel style={{ fontSize: 12 }}>Description</InputLabel>
+              <TextField
+                name="description"
+                className="form-control"
+                variant="standard"
+                fullWidth
+                inputProps={{ style: { fontSize: 16, padding: 10 } }}
+              />
+            </DialogContent>
+            <DialogActions>
               <input type="hidden" name="id" id="id" Value={props.id} />
               <input
                 type="hidden"
@@ -225,7 +247,7 @@ function BuyLogCom(props) {
                 Value={localStorage.getItem("codeLogin")}
               />
               <Button type="submit" style={{ fontSize: "14px" }}>
-                Cancel the order
+                {isSubmitting ? "Please wait..." : "Cancel the order"}
               </Button>
               <Button
                 onClick={handleClose}
@@ -234,8 +256,8 @@ function BuyLogCom(props) {
               >
                 Close
               </Button>
-            </form>
-          </DialogActions>
+            </DialogActions>
+          </form>
         </Dialog>
       </div>
     </tbody>

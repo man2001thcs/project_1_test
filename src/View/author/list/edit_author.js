@@ -10,12 +10,10 @@ import { useEffect } from "react";
 import link from "../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
-import { ActionTypes } from "@mui/base";
+import Alert from "@mui/material/Alert";
 
 function EditAuthor() {
   const [result, setResult] = useState("");
@@ -108,23 +106,23 @@ function EditAuthor() {
           setResult(data);
         },
       });
-      alert("Change complete!!");
+      //alert("Change complete!!");
       setSubmitting(false);
-      window.location.href = link.client_link + "author/list";
+      //window.location.href = link.client_link + "author/list";
     }, 2000);
   };
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Change complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "author/list";
+    }
+  }, [result]);
 
   function edit_author(inputName, inputAddress, inputPhone, inputSpecial) {
     return (
       <div>
-        <h1>Author edit</h1>
-        {parseInt(success) === 0 && (
-          <h3 style={{ color: "red" }}>Change failed</h3>
-        )}
-        {parseInt(success) === 1 && (
-          <h3 style={{ color: "green" }}>Change successed</h3>
-        )}
-
         <form
           action={link.server_link + "controller/author/edit.php"}
           method="post"
@@ -132,7 +130,19 @@ function EditAuthor() {
             handleSubmitM(event);
           }}
         >
-          <div>
+          <div
+            class="container"
+            style={{
+              backgroundColor: "white",
+              borderRadius: "10px",
+              padding: "20px 30px 20px",
+            }}
+          >
+            <h2 style={{
+            fontWeight: "bold",
+            fontSize: '24px',
+            marginBottom: '20px',
+          }}><i class="fa fa-info-circle"></i> Edit author </h2>
             <div class="row">
               <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                 <div className="form-group">
@@ -194,6 +204,11 @@ function EditAuthor() {
 
             <div class="row">
               <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+              {parseInt(result) === 0 && (
+                <Alert severity="error" style={{ marginBottom: "20px" }}>
+                  Change failed
+                </Alert>
+              )}
                 <div className="form-group">
                   <input
                     type="hidden"
@@ -213,6 +228,7 @@ function EditAuthor() {
                     id="codeS"
                     Value={localStorage.getItem("codeLogin")}
                   />
+
                   <Button
                     type="submit"
                     className="btn btn-primary"

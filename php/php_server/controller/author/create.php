@@ -27,23 +27,25 @@ if (isset($_POST)) {
 			'modified' => date('Y-m-d H:i:s')			
 			)
 	);
-	echo json_encode($dataSub);
+	//echo json_encode($dataSub);
 	if (strcmp($user->login_code($_POST['emailS']), $_POST['codeS']) == 0  && $user->is_admin($_POST['emailS'])){
 		if ($author->save($dataSub)) {
 			if ($_POST['codeS']){
-				$link = 'user_author.json';
-				$linkc = './log_session/'.$link;
-				//file_put_contents($linkc, (json_encode (new stdClass)));
-				unlink($linkc);
-				header('Location: ' . SERVER_URL . 'controller/author/list.php?email='.$_POST['emailS']);
+				$linku = './log_session/user_author.json';
+				$resultS = $author->findAll();
+				file_put_contents($linku, json_encode($resultS));	
+				//header('Location: ' . CLIENT_URL . 'author/list');
+				echo 1;	
 			}
 			
 		} else {
-			header('Location: ' . CLIENT_URL . 'author/input?success=0');
+			//header('Location: ' . CLIENT_URL . 'author/input?success=0');
+			echo 0;	
 		}
 	}	
 }
 else {
-	header('Location: ' . CLIENT_URL . 'author/input?success=0');
+	//header('Location: ' . CLIENT_URL . 'author/input?success=0');
+	echo 0;	
 }
 ?>

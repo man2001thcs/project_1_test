@@ -2,19 +2,17 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
 import $ from "jquery";
-import bootstrap from "bootstrap";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import link from "../../../../config/const";
 import { useLocation } from "react-router-dom";
 import GenerateRandomCode from "react-random-code-generator";
 
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
-import { ActionTypes } from "@mui/base";
+import Alert from "@mui/material/Alert";
 
 function InputBook() {
   const [result, setResult] = useState("");
@@ -22,23 +20,13 @@ function InputBook() {
   const [listState3, setListState3] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
-  const search = useLocation().search;
-  const success = new URLSearchParams(search).get("success");
 
-  const top100Films = [
-    { title: "The Shawshank Redemption", year: 1994 },
-    { title: "The Godfather", year: 1972 },
-    { title: "The Godfather: Part II", year: 1974 },
-    { title: "The Dark Knight", year: 2008 },
-    { title: "12 Angry Men", year: 1957 },
-    { title: "Schindler's List", year: 1993 },
-    { title: "Pulp Fiction", year: 1994 },
-  ];
+  const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
 
   const urlAuthor =
     link.server_link +
     "controller/author/log_session/user_author.json?timeStamp=" +
-    GenerateRandomCode.NumCode(4);
+    GenerateRandomCode.NumCode(10);
 
   useEffect(() => {
     const getData = async () => {
@@ -66,7 +54,7 @@ function InputBook() {
   const urlVoucher =
     link.server_link +
     "controller/voucher/log_session/user_voucher.json?timeStamp=" +
-    GenerateRandomCode.NumCode(4);
+    GenerateRandomCode.NumCode(10);
 
   useEffect(() => {
     const getData = async () => {
@@ -104,7 +92,7 @@ function InputBook() {
   function select_Voucher(voucher_options) {
     return (
       <div class="row">
-        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
           <div class="form-group">
             <InputLabel style={{ fontSize: 12 }}>Voucher</InputLabel>
             <Autocomplete
@@ -122,10 +110,7 @@ function InputBook() {
               limitTags={3}
               filterSelectedOptions
               renderInput={(params) => (
-                <TextField
-                  {...params}             
-                  placeholder="Favorites"
-                />
+                <TextField {...params} placeholder="Favorites" />
               )}
             />
           </div>
@@ -137,7 +122,7 @@ function InputBook() {
   function select_Author(author_options) {
     return (
       <div class="row">
-        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
           <div class="form-group">
             <InputLabel style={{ fontSize: 12 }}>Author</InputLabel>
             <Autocomplete
@@ -171,28 +156,28 @@ function InputBook() {
     );
   }
 
-  function find_author(author_id) {
-    return listState2?.find((element) => {
-      return element["WpAuthor"].id === author_id;
-    });
-  }
-
   const SignupSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Too Short!")
       .max(70, "Too Long!")
       .required("Required name!!"),
+
     price: Yup.number("Enter a valid number").required("Required number!!"),
+
     page_number: Yup.number("Enter a valid number").required(
       "Required number!!"
     ),
+
     type: Yup.string().required("Required type!!"),
+
     bought_number: Yup.number("Enter a valid number").required(
       "Required number!!"
     ),
+
     remain_number: Yup.number("Enter a valid number").required(
       "Required number!!"
     ),
+
     description: Yup.string().required("Required description!!"),
   });
 
@@ -243,203 +228,235 @@ function InputBook() {
 
           // you can also set the other form states here
         });
-        
-        alert("Insert complete!!");
-        window.location.href = link.client_link + "book/list";
+
+        //alert("Insert complete!!");
+        //window.location.href = link.client_link + "book/list";
       }, 2000);
     },
   });
 
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Insert complete!!");
+      setResult("-1");
+      window.location.href = link.client_link + "book/list";
+    }
+  }, [result]);
+
   //console.log(formik.values.voucher_id);
   return (
     <div>
-      <h1 style={{ fontWeight: "bold" }}>Insert new book</h1>
-      {parseInt(success) === 0 && (
-        <h3 style={{ color: "red" }}>Insert failed</h3>
-      )}
-      {parseInt(success) === 1 && (
-        <h3 style={{ color: "green" }}>Insert successed</h3>
-      )}
-
       <form method="post" onSubmit={formik.handleSubmit}>
         <div
-          class="container"
           style={{
             backgroundColor: "white",
             borderRadius: "10px",
-            padding: "30px 30px 30px",
+            padding: "20px 30px 20px",
           }}
         >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              marginBottom: "20px",
+            }}
+          >
+            <i class="fa fa-book"></i> Insert new book{" "}
+          </h2>
           <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Name</InputLabel>
-                <TextField
-                  name="name"
-                  className="form-control"
-                  variant="standard"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  error={formik.touched?.name && Boolean(formik.errors?.name)}
-                  helperText={formik.touched?.name && formik.errors?.name}
-                />
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>Name</InputLabel>
+                    <TextField
+                      name="name"
+                      className="form-control"
+                      variant="standard"
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      error={
+                        formik.touched?.name && Boolean(formik.errors?.name)
+                      }
+                      helperText={formik.touched?.name && formik.errors?.name}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>Price</InputLabel>
+                    <TextField
+                      name="price"
+                      className="form-control"
+                      variant="standard"
+                      value={formik.values.price}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      error={
+                        formik.touched?.price && Boolean(formik.errors?.price)
+                      }
+                      helperText={formik.touched?.price && formik.errors?.price}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>
+                      Page number
+                    </InputLabel>
+                    <TextField
+                      name="page_number"
+                      className="form-control"
+                      variant="standard"
+                      value={formik.values.page_number}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      error={
+                        formik.touched.page_number &&
+                        Boolean(formik.errors.page_number)
+                      }
+                      helperText={
+                        formik.touched.page_number && formik.errors.page_number
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>
+                      Bought number
+                    </InputLabel>
+                    <TextField
+                      name="bought_number"
+                      className="form-control"
+                      variant="standard"
+                      value={formik.values.bought_number}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      error={
+                        formik.touched.bought_number &&
+                        Boolean(formik.errors.bought_number)
+                      }
+                      helperText={
+                        formik.touched.bought_number &&
+                        formik.errors.bought_number
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>
+                      Remain number
+                    </InputLabel>
+                    <TextField
+                      name="remain_number"
+                      className="form-control"
+                      value={formik.values.remain_number}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      variant="standard"
+                      error={
+                        formik.touched.remain_number &&
+                        Boolean(formik.errors.remain_number)
+                      }
+                      helperText={
+                        formik.touched.remain_number &&
+                        formik.errors.remain_number
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Price</InputLabel>
-                <TextField
-                  name="price"
-                  className="form-control"
-                  variant="standard"
-                  value={formik.values.price}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  error={formik.touched?.price && Boolean(formik.errors?.price)}
-                  helperText={formik.touched?.price && formik.errors?.price}
-                />
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>Type</InputLabel>
+                    <TextField
+                      name="type"
+                      className="form-control"
+                      value={formik.values.type}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      variant="standard"
+                      error={formik.touched.type && Boolean(formik.errors.type)}
+                      helperText={formik.touched.type && formik.errors.type}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Page number</InputLabel>
-                <TextField
-                  name="page_number"
-                  className="form-control"
-                  variant="standard"
-                  value={formik.values.page_number}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  error={
-                    formik.touched.page_number &&
-                    Boolean(formik.errors.page_number)
-                  }
-                  helperText={
-                    formik.touched.page_number && formik.errors.page_number
-                  }
-                />
+              <div class="row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                  <div className="form-group">
+                    <InputLabel style={{ fontSize: 12 }}>Content</InputLabel>
+                    <TextField
+                      name="description"
+                      className="form-control"
+                      value={formik.values.description}
+                      onChange={formik.handleChange}
+                      inputProps={{ style: { fontSize: 16, padding: 10 } }}
+                      variant="standard"
+                      error={
+                        formik.touched.description &&
+                        Boolean(formik.errors.description)
+                      }
+                      helperText={
+                        formik.touched.description && formik.errors.description
+                      }
+                    />
+                  </div>
+                </div>
               </div>
+
+              {select_Author(
+                listState2?.sort(
+                  (a, b) => -(b?.WpAuthor.name).localeCompare(a?.WpAuthor.name)
+                )
+              )}
+              {select_Voucher(
+                listState3?.sort(
+                  (a, b) =>
+                    -(b?.WpVoucher.name).localeCompare(a?.WpVoucher.name)
+                )
+              )}
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Bought number</InputLabel>
-                <TextField
-                  name="bought_number"
-                  className="form-control"
-                  variant="standard"
-                  value={formik.values.bought_number}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  error={
-                    formik.touched.bought_number &&
-                    Boolean(formik.errors.bought_number)
-                  }
-                  helperText={
-                    formik.touched.bought_number && formik.errors.bought_number
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Remain number</InputLabel>
-                <TextField
-                  name="remain_number"
-                  className="form-control"
-                  value={formik.values.remain_number}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  variant="standard"
-                  error={
-                    formik.touched.remain_number &&
-                    Boolean(formik.errors.remain_number)
-                  }
-                  helperText={
-                    formik.touched.remain_number && formik.errors.remain_number
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Type</InputLabel>
-                <TextField
-                  name="type"
-                  className="form-control"
-                  value={formik.values.type}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  variant="standard"
-                  error={formik.touched.type && Boolean(formik.errors.type)}
-                  helperText={formik.touched.type && formik.errors.type}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <InputLabel style={{ fontSize: 12 }}>Content</InputLabel>
-                <TextField
-                  name="description"
-                  className="form-control"
-                  value={formik.values.description}
-                  onChange={formik.handleChange}
-                  inputProps={{ style: { fontSize: 16, padding: 10 } }}
-                  variant="standard"
-                  error={
-                    formik.touched.description &&
-                    Boolean(formik.errors.description)
-                  }
-                  helperText={
-                    formik.touched.description && formik.errors.description
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          {select_Author(
-            listState2?.sort(
-              (a, b) => -(b?.WpAuthor.name).localeCompare(a?.WpAuthor.name)
-            )
-          )}
-          {select_Voucher(
-            listState3?.sort(
-              (a, b) => -(b?.WpVoucher.name).localeCompare(a?.WpVoucher.name)
-            )
-          )}
-
-          <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="form-group">
-                <Button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={formik.isSubmitting}
-                  color="primary"
-                  variant="contained"
-                  fullWidth
-                >
-                  {formik.isSubmitting ? "Please wait..." : "Submit"}
-                </Button>
+            <div class="row">
+              <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                {parseInt(result) === 0 && (
+                  <Alert severity="error" style={{ marginBottom: "20px" }}>
+                    Insert failed
+                  </Alert>
+                )}
+                <div className="form-group">
+                  <Button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={formik.isSubmitting}
+                    color="primary"
+                    variant="contained"
+                    fullWidth
+                  >
+                    {formik.isSubmitting ? "Please wait..." : "Submit"}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

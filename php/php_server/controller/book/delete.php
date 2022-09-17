@@ -19,13 +19,13 @@ $id = isset($_POST['id']) ? intval($_POST['id']) : null;
 
 if (strcmp($user->login_code($_POST['emailS']), $_POST['codeS']) == 0  && $user->is_admin($_POST['emailS'])){
 	if ($book->deleteById($id)){
-		$link = $_POST['codeS'].'.json';
-		$linkb = './log_session/'.$link;
-		file_put_contents($linkb, (json_encode (new stdClass)));
-		unlink($linkb);
-		header('Location: ' . SERVER_URL . 'controller/book/list.php?codeLogin=' . $_POST["codeS"]);
+		$linku = './log_session/user_book.json';
+		$resultU = $book->findAll();
+		file_put_contents($linku, json_encode($resultU));	
+		echo 1;
 	} else {
-		header('Location: ' . CLIENT_URL . '/book/list?success=0');
+		echo 0;
+		//header('Location: ' . CLIENT_URL . '/book/list?success=0');
 	}
 }
 ?>
