@@ -88,5 +88,12 @@ class Buy_log extends AppModel {
 		return implode('', $code);
 	}
 	
+	public function findByReceiveId($receive_id) {
+		$data = $this->find(array(
+			'conditions' => array($this->alias.'.receive_id' => $receive_id)
+		), 'all');
+		//echo json_encode($data);
+		return $data;
+	}
 	
 }

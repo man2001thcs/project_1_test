@@ -22,17 +22,15 @@ function BuyLogCom(props) {
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
 
+  const [command, setCommand] = useState();
+
   const [isSubmitting, setSubmitting] = useState();
   const [result, setResult] = useState("");
 
-  const urlBuy_log =
-    link.buylog_link +
-    localStorage.getItem("codeLogin") +
-    ".json&timeStamp=" +
-    GenerateRandomCode.NumCode(4);
 
   //console.log(props.state);
 
+  //fetch data
   const urlBuyLog =
     link.buylog_link +
     localStorage.getItem("codeLogin") +
@@ -92,13 +90,17 @@ function BuyLogCom(props) {
       }
     });
   }, []);
+  //
+
 
   function complete_receive(state) {
     if (state === "0") {
-      return <td>On progress</td>;
+      return <td>Wait</td>;
     } else if (state === "1") {
-      return <td>Complete</td>;
+      return <td>On progress</td>;
     } else if (state === "2") {
+      return <td>Complete</td>;
+    } else if (state === "3") {
       return <td>Deleted</td>;
     }
   }
@@ -129,24 +131,38 @@ function BuyLogCom(props) {
       );
     });
 
-  const [openComplete, setOpenComplete] = useState(false);
-  const [openCancel, setOpenCancel] = useState(false);
+  const [openCommand, setOpenCommand] = useState(false);
 
-  const handleClickOpenCancel = () => {
-    setOpenCancel(true);
+  //command function
+  const handleClickOpenCommand1 = () => {
+    //acepted
+    setCommand(1);
+    setOpenCommand(true);
   };
 
-  const handleCloseCancel = () => {
-    setOpenCancel(false);
+  const handleClickOpenCommand2 = () => {
+    //complete
+    setCommand(2);
+    setOpenCommand(true);
   };
 
-  const handleClickOpenComplete = () => {
-    setOpenComplete(true);
+  const handleClickOpenCommand3 = () => {
+    //cancel
+    setCommand(3);
+    setOpenCommand(true);
   };
 
-  const handleCloseComplete = () => {
-    setOpenComplete(false);
+  const handleClickOpenCommand4 = () => {
+    //send message
+    setCommand(4);
+    setOpenCommand(true);
   };
+
+  const handleCloseCommand = () => {
+    setCommand(0);
+    setOpenCommand(false);
+  };
+  //
 
   const handleSubmitM = (e) => {
     e.preventDefault();
@@ -169,7 +185,7 @@ function BuyLogCom(props) {
   };
 
   useEffect(() => {
-    if (parseInt(result) === 1) {
+    if (parseInt(result) >= 1) {
       alert("Change complete!!");
       setResult("-1");
       window.location.href = link.client_link + "buy_log/list";
@@ -186,7 +202,7 @@ function BuyLogCom(props) {
         <td>{props.address}</td>
         <td></td>
         <td></td>
-        <td>{props.total_price}</td>       
+        <td>{props.total_price}</td>
         {complete_receive(props.state)}
         <td>{props.description}</td>
         <td>
@@ -196,24 +212,47 @@ function BuyLogCom(props) {
               class="btn btn-success"
               id="viewButton"
               name="viewButton"
-              onClick={() => handleClickOpenComplete()}
+              onClick={() => handleClickOpenCommand1()}
+              style={{ margin: "10px" }}
+            >
+              Accept
+            </button>
+          )}
+          {props.state === "1" && (
+            <button
+              type="button"
+              class="btn btn-success"
+              id="viewButton"
+              name="viewButton"
+              onClick={() => handleClickOpenCommand2()}
               style={{ margin: "10px" }}
             >
               Complete
             </button>
           )}
-          {props.state === "0" && props.state !== "1" && (
+          {(props.state === "0" || props.state === "1") && (
             <button
               type="button"
               class="btn btn-danger"
               id="viewButton"
               name="viewButton"
               style={{ margin: "10px" }}
-              onClick={() => handleClickOpenCancel()}
+              onClick={() => handleClickOpenCommand3()}
             >
               Cancel
             </button>
           )}
+
+          <button
+            type="button"
+            class="btn btn-info"
+            id="viewButton"
+            name="viewButton"
+            style={{ margin: "10px", color: 'white' }}
+            onClick={() => handleClickOpenCommand4()}
+          >
+            Message
+          </button>
         </td>
       </tr>
       {cart}
@@ -226,8 +265,8 @@ function BuyLogCom(props) {
 
       <div>
         <Dialog
-          open={openCancel}
-          onClose={handleCloseCancel}
+          open={openCommand}
+          onClose={handleCloseCommand}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
@@ -240,7 +279,10 @@ function BuyLogCom(props) {
               id="alert-dialog-title"
               style={{ fontSize: "18px", fontWeight: "bold" }}
             >
-              Cancel order
+              {parseInt(command) === 1 && "Accept order"}
+              {parseInt(command) === 2 && "Complete order"}
+              {parseInt(command) === 3 && "Cancel order"}
+              {parseInt(command) === 4 && "Set message"}
             </DialogTitle>
             <DialogContent>
               <InputLabel style={{ fontSize: 12 }}>Description</InputLabel>
@@ -254,7 +296,12 @@ function BuyLogCom(props) {
             </DialogContent>
             <DialogActions>
               <input type="hidden" name="id" id="id" Value={props.id} />
-              <input type="hidden" name="command" id="command" Value={0} />
+              <input
+                type="hidden"
+                name="command"
+                id="command"
+                Value={command}
+              />
               <input
                 type="hidden"
                 name="emailS"
@@ -269,67 +316,15 @@ function BuyLogCom(props) {
               />
 
               <Button type="submit" style={{ fontSize: "14px" }}>
-                {isSubmitting ? "Please wait..." : "Cancel the order"}
+                {isSubmitting
+                  ? "Please wait..."
+                  : (parseInt(command) === 1 && "Accept order") ||
+                    (parseInt(command) === 2 && "Complete order") ||
+                    (parseInt(command) === 3 && "Cancel order") ||
+                    (parseInt(command) === 4 && "Set message")}
               </Button>
               <Button
-                onClick={() => handleCloseCancel()}
-                autoFocus
-                style={{ fontSize: "14px" }}
-              >
-                Close
-              </Button>
-            </DialogActions>
-          </form>
-        </Dialog>
-
-        <Dialog
-          open={openComplete}
-          onClose={handleCloseComplete}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <form
-            action={link.server_link + "controller/receive/edit.php"}
-            method="post"
-            onSubmit={(e) => handleSubmitM(e)}
-          >
-            <DialogTitle
-              id="alert-dialog-title"
-              style={{ fontSize: "18px", fontWeight: "bold" }}
-            >
-              Complete order
-            </DialogTitle>
-            <DialogContent>
-              <InputLabel style={{ fontSize: 12 }}>Description</InputLabel>
-              <TextField
-                name="description"
-                className="form-control"
-                variant="standard"
-                fullWidth
-                inputProps={{ style: { fontSize: 16, padding: 10 } }}
-              />
-            </DialogContent>
-            <DialogActions>
-              <input type="hidden" name="id" id="id" Value={props.id} />
-              <input type="hidden" name="command" id="command" Value={1} />
-              <input
-                type="hidden"
-                name="emailS"
-                id="emailS"
-                Value={localStorage.getItem("email")}
-              />
-              <input
-                type="hidden"
-                name="codeS"
-                id="codeS"
-                Value={localStorage.getItem("codeLogin")}
-              />
-
-              <Button type="submit" style={{ fontSize: "14px" }}>
-                {isSubmitting ? "Please wait..." : "Complete the order"}
-              </Button>
-              <Button
-                onClick={() => handleCloseComplete()}
+                onClick={() => handleCloseCommand()}
                 autoFocus
                 style={{ fontSize: "14px" }}
               >

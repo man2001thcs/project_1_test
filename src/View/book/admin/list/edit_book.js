@@ -29,6 +29,7 @@ function EditBook() {
   const [isSubmitting, setSubmitting] = useState();
 
   const [voucher_id, setVoucher] = useState();
+  const [author_id, setAuthor] = useState();
 
   //Data fetch session
   const urlBook =
@@ -125,16 +126,23 @@ function EditBook() {
     (a, b) => -(b?.WpVoucher.name).localeCompare(a?.WpVoucher.name)
   );
 
+  const author_options = listState2?.sort(
+    (a, b) => -(b?.WpAuthor.name).localeCompare(a?.WpAuthor.name)
+  );
+
   //console.log(voucher_id);
 
   function select_Voucher(voucher_options, book) {
     var temp = [];
-    book?.WpBook.voucher_id?.split(";")?.filter((item) => item !== "").map((item, index) => {
-      var temp1 = listState3?.find((element) => {
-        return element?.WpVoucher.id === item;
+    book?.WpBook.voucher_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        var temp1 = listState3?.find((element) => {
+          return element?.WpVoucher.id === item;
+        });
+        temp.push(temp1);
       });
-      temp.push(temp1);
-    });
     //console.log(temp);
     return (
       <div class="row">
@@ -169,7 +177,54 @@ function EditBook() {
     );
   }
 
-  
+  //console.log(author_id);
+
+  function select_Author(author_options, book) {
+    var temp = [];
+    book?.WpBook.author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        var temp1 = listState2?.find((element) => {
+          return element?.WpAuthor.id === item;
+        });
+        temp.push(temp1);
+      });
+
+
+    //console.log(temp);
+    return (
+      <div class="row">
+        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+          <div class="form-group">
+            <InputLabel style={{ fontSize: 12 }}>Author</InputLabel>
+
+            <Autocomplete
+              multiple
+              id="tags-outlined"
+              options={author_options ?? []}
+              getOptionLabel={(option) => option?.WpAuthor.name}
+              getOptionValue={(option) => option?.WpAuthor.name}
+              isOptionEqualToValue={(option, value) =>
+                option?.WpAuthor.id === value?.WpAuthor.id
+              }
+              onChange={(e, value) => setAuthor(JSON.stringify(value))}
+              limitTags={3}
+              filterSelectedOptions
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={temp.map((item, index) => {
+                    return item?.WpAuthor.name + "; ";
+                  })}
+                />
+              )}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const [inputName, setInputName] = useState(book?.WpBook.name);
   const [inputPrices, setInputPrice] = useState(book?.WpBook.price);
@@ -182,16 +237,6 @@ function EditBook() {
     book?.WpBook.remain_number
   );
   const [description, setDescription] = useState(book?.WpBook.description);
-
-  const author_options = listState2
-    ?.map((option) => {
-      const firstLetter = option?.WpAuthor.name[0].toUpperCase();
-      return {
-        firstLetter: /[0-9]/.test(firstLetter) ? "0-9" : firstLetter,
-        ...option,
-      };
-    })
-    .sort((a, b) => -(b?.firstLetter).localeCompare(a?.firstLetter));
 
   useEffect(() => {
     setInputName(book?.WpBook.name);
@@ -213,31 +258,29 @@ function EditBook() {
         url: link.server_link + "controller/book/edit.php",
         data: form.serialize(),
         success(data) {
-          //console.log(data);
+          console.log(data);
           setResult(data);
         },
       });
-      
+
       setSubmitting(false);
       //window.location.href = link.client_link + "book/list";
     }, 2000);
   };
 
+  //console.log(author_id);
+
   useEffect(() => {
     if (parseInt(result) === 1) {
       alert("Change complete!!");
       setResult("-1");
-      window.location.href = link.client_link + "book/list";   
+      window.location.href = link.client_link + "book/list";
     }
   }, [result]);
 
   return (
     <div>
-      <form
-        action={link.server_link + "controller/book/edit.php"}
-        method="post"
-        onSubmit={(e) => handleSubmitM(e)}
-      >
+      <form method="post" onSubmit={(e) => handleSubmitM(e)}>
         <div
           class="container"
           style={{
@@ -257,7 +300,6 @@ function EditBook() {
           </h2>
           <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-
               <div class="row">
                 <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
                   <div className="form-group">
@@ -378,41 +420,14 @@ function EditBook() {
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-                  <InputLabel style={{ fontSize: 12 }}>Author</InputLabel>
-                  <div class="form-group">
-                    <Autocomplete
-                      autoHighlight
-                      options={author_options}
-                      groupBy={(option) => option?.firstLetter}
-                      getOptionLabel={(option) => option?.WpAuthor.name}
-                      isOptionEqualToValue={(option, value) =>
-                        option?.WpAuthor.id === value?.WpAuthor.id
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          id="author_id"
-                          name="author_id"
-                          placeholder={authorName}
-                          {...params}
-                          inputProps={{
-                            ...params.inputProps,
-                            autoComplete: "false", // disable autocomplete and autofill
-                          }}
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
+              {select_Author(author_options, book)}
 
               {select_Voucher(voucher_options, book)}
             </div>
 
             <div class="row">
               <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
-              {parseInt(result) === 0 && (
+                {parseInt(result) === 0 && (
                   <Alert severity="error" style={{ marginBottom: "20px" }}>
                     Change failed
                   </Alert>
@@ -429,6 +444,12 @@ function EditBook() {
                     name="voucher_id"
                     id="voucher_id"
                     Value={voucher_id}
+                  />
+                  <input
+                    type="hidden"
+                    name="author_id"
+                    id="author_id"
+                    Value={author_id}
                   />
                   <input
                     type="hidden"

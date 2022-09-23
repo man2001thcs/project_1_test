@@ -12,13 +12,14 @@ function BuyLogList(props) {
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
 
+  //fetch data
   const urlReceive =
     link.receive_link +
     localStorage.getItem("codeLogin") +
     ".json?timeStamp=" +
     GenerateRandomCode.NumCode(4);
 
-  console.log(urlReceive);
+  //console.log(urlReceive);
 
   useEffect(() => {
     const getData = async () => {
@@ -54,9 +55,9 @@ function BuyLogList(props) {
     return listState?.slice(firstPageIndex ?? 0, lastPageIndex ?? 6);
   }, [currentPage]);
 
-  console.log(listState?.length);
+  //console.log(listState?.length);
 
-  console.log(currentTableData);
+  //console.log(currentTableData);
   const itemmap1 = (currentTableData ?? listState?.slice(0, 6))?.map(
     (item, index) => (
       <BuyLogCom

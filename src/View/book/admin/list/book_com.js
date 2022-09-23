@@ -14,7 +14,9 @@ function BookCom(props) {
   const [result, setResult] = useState("");
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
+
   const [isSubmitting, setSubmitting] = useState("");
+
   const edit_button = () => {
     set_appear(true);
   };
@@ -26,6 +28,7 @@ function BookCom(props) {
     setDelete(false);
   };
 
+  //fetch data
   const urlAuthor =
     link.server_link +
     "controller/author/log_session/user_author.json?timeStamp=" +
@@ -60,11 +63,12 @@ function BookCom(props) {
     });
   }
 
+  //submit function
   const handleSubmitM = (e) => {
     e.preventDefault();
     setSubmitting(true);
     setTimeout(() => {
-      const form = $(e.target);  
+      const form = $(e.target);
       $.ajax({
         type: "POST",
         url: link.server_link + "controller/book/delete.php",
@@ -80,6 +84,7 @@ function BookCom(props) {
     }, 2000);
   };
 
+  //check return status
   useEffect(() => {
     if (parseInt(result) === 1) {
       alert("Delete complete!!");
@@ -100,7 +105,15 @@ function BookCom(props) {
         <td>{props.remainNum}</td>
         <td>
           {!deleting && (
-            <NavLink href={link.client_link + "book/edit?book_id=" + props.id + "&author="  + find_author(props.author)?.WpAuthor.name} >
+            <NavLink
+              href={
+                link.client_link +
+                "book/edit?book_id=" +
+                props.id +
+                "&author=" +
+                find_author(props.author)?.WpAuthor.name
+              }
+            >
               <button
                 type="button"
                 class="btn btn-success"
@@ -113,10 +126,7 @@ function BookCom(props) {
             </NavLink>
           )}
 
-          <form
-            method="post"
-            onSubmit={(e) => handleSubmitM(e)}
-          >
+          <form method="post" onSubmit={(e) => handleSubmitM(e)}>
             <input type="hidden" name="id" id="id" value={props.id} />
             <input
               type="hidden"

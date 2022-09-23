@@ -24,16 +24,9 @@ $this_data = $book->findById($id);
 
 if (isset($_POST)) {
 
-	$author_id = ($_POST['author_id']=='') ? $this_data['WpBook']['author_id'] : $_POST['author_id'];
-	//echo $_POST['author_id'];
-
-	if (isset($_POST['author_id']) && ($_POST['author_id'] != null) && ($_POST['author_id'] != "")){
-		$author_name = $author->findByName($author_id);
-	} else {
-		$author_name = $this_data['WpBook']['author_id'];
-	}
-
 	$voucher_string = "";
+
+	$author_string = "";
 
 	if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] != null) && ($_POST['voucher_id'] != "")){
 		$voucher_this = json_decode($_POST['voucher_id'], true);
@@ -54,6 +47,27 @@ if (isset($_POST)) {
 		$voucher_string = $this_data['WpBook']['voucher_id'];
 	}
 
+	//echo json_encode($_POST['author_id']);
+
+	if (isset($_POST['author_id']) && ($_POST['author_id'] != null) && ($_POST['author_id'] != "")){
+		$author_this = json_decode($_POST['author_id'], true);
+
+		//echo json_encode($author_this);
+	
+		usort($author_this, function($a, $b) {return strcmp($a['WpAuthor']['id'], $b['WpAuthor']['id']);});
+		
+		$author_string = "";
+	
+		foreach ($author_this as $item){
+			//echo json_encode($item);
+			//echo $item['WpVoucher']['id'];
+			$temp = $author_string;
+			$author_string = $temp . strval($item['WpAuthor']['id']) . ';';
+		}
+	} else {
+		$author_string = $this_data['WpBook']['author_id'];
+	}
+
 	
 	$dataSub = array(
 		'WpBook' => array(
@@ -67,8 +81,9 @@ if (isset($_POST)) {
 			'description' => $_POST['description'] ?? $this_data['WpBook']['description'],
 			'created' => $this_data['WpBook']['created'],	
 			'modified' => date('Y-m-d H:i:s') ?? $this_data['WpBook']['modified'],
-			'author_id' =>  $author_name ?? $this_data['WpBook']['author_id'],
+			'author_id' =>  $author_string ?? $this_data['WpBook']['author_id'],
 			'voucher_id' => $voucher_string ?? $this_data['WpBook']['voucher_id'],
+			'image_number' => 1
 			)
 	);
 	//echo json_encode($dataSub);

@@ -3,8 +3,16 @@ import "./css/login.css";
 import "../node_modules/bootstrap/dist/js/bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import $ from "jquery";
+import link from "./config/const";
+import LoginImg from './image/login.gif';
+
+import './css/bootstrap-3.4.1-dist/css/bootstrap.min.css';
+import './css/font-awesome-4.7.0/font-awesome-4.7.0/css/font-awesome.min.css';
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Slideshow from "./View/test/alertD";
 
 import Main_page from "./View/main_page";
 import Header from "./View/element/header";
@@ -43,8 +51,14 @@ function App() {
   const [loading, setLoading] = useState();
   const [logined, setLogined] = useState();
   const [isAdmin, setAdmin] = useState();
+
+  const [result, setResult] = useState("");
+  const [isSubmitting, setSubmitting] = useState();
+
+  //fetch dât
   const urlAccount =
-    "http://localhost/php_server/controller/user/log_session/" +
+    link.server_link +
+    "controller/user/log_session/" +
     localStorage.getItem("codeLogin") +
     ".json?timeStamp=" +
     GenerateRandomCode.NumCode(4);
@@ -85,9 +99,20 @@ function App() {
       setLogined(false);
     }
   }, []);
+
   console.log(loginState?.length !== 0);
   console.log(loginState?.is_admin);
   console.log(loginState?.id);
+
+  useEffect(() => {
+    if (parseInt(result) >= 1) {
+      alert("Order complete!!");
+      setResult("-1");
+      localStorage.setItem("cart", []);
+      window.location.href = link.client_link + "buy_log/list";
+    }
+  }, [result]);
+
   return (
     <div>
       <Header login={logined} isAdmin={loginState?.is_admin} />
@@ -100,6 +125,8 @@ function App() {
           <Routes>
             <Route path="/">
               <Route index element={<Main_page />} />
+              <Route path="book/user/list" element={<BookListUs/>} />
+              <Route path="book/user/detail" element={<BookDes login={logined}/>} />
 
               {loginState?.is_admin > 0 && (
                 <Route>
@@ -119,8 +146,6 @@ function App() {
               {loginState?.is_admin !== 1 && (
                 <Route>
                   <Route path="home" element={<BookListU />} />
-                  <Route path="book/user/list" element={<BookListUs />} />
-                  <Route path="book/user/detail" element={<BookDes />} />
                   <Route path="author/user/list" element={<AuthorList />} />
                   <Route path="buy_log/list" element={<BuyLogList />} />
                   <Route
@@ -137,6 +162,7 @@ function App() {
 
               <Route path="login" element={<Login />} />
               <Route path="signin" element={<SignIn />} />
+              <Route path="test" element={<Slideshow />} />
 
               {loginState?.length !== 0 && typeof loginState !== "undefined" && (
                 <Route>
@@ -152,7 +178,11 @@ function App() {
                   />
                   <Route
                     path="user/password"
-                    element={<EditPassword password={localStorage.getItem('password')} />}
+                    element={
+                      <EditPassword
+                        password={localStorage.getItem("password")}
+                      />
+                    }
                   />
                 </Route>
               )}

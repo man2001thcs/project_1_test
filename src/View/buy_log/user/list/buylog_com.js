@@ -26,6 +26,7 @@ function BuyLogCom(props) {
   const [loading, setLoading] = useState();
   const [isSubmitting, setSubmitting] = useState();
 
+  //fetch data
   const urlReceive =
     link.buylog_link +
     localStorage.getItem("codeLogin") +
@@ -84,13 +85,16 @@ function BuyLogCom(props) {
       }
     });
   }, []);
+  //
 
   function complete_receive(state) {
     if (state === "0") {
-      return <td>On progress</td>;
+      return <td>Wait</td>;
     } else if (state === "1") {
-      return <td>Complete</td>;
+      return <td>On progress</td>;
     } else if (state === "2") {
+      return <td>Canceled</td>;
+    } else if (state === "3") {
       return <td>Canceled</td>;
     }
   }
@@ -169,7 +173,7 @@ function BuyLogCom(props) {
   };
 
   useEffect(() => {
-    if (parseInt(result) === 1) {
+    if (parseInt(result) >= 1) {
       alert("Cancel complete!!");
       setResult("-1");
       window.location.href = link.client_link + "buy_log/list";

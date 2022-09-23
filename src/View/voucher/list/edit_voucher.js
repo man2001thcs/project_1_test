@@ -37,6 +37,7 @@ function EditVoucher() {
   }
   */
 
+  //fetch data
   const urlVoucher =
     link.server_link +
     "controller/voucher/log_session/user_voucher.json?timeStamp=" +
@@ -64,6 +65,7 @@ function EditVoucher() {
       }
     });
   }, []);
+  //
 
   const voucher = listState2?.find((element) => {
     return element?.WpVoucher.id === voucher_id;

@@ -14,9 +14,8 @@ import Alert from "@mui/material/Alert";
 function InputAuthor() {
   const [result, setResult] = useState("");
   const search = useLocation().search;
-  const success = new URLSearchParams(search).get("success");
-  const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
 
+  //validation form
   const SignupSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Too Short!")
@@ -29,8 +28,8 @@ function InputAuthor() {
       .min(2, "Too Short!")
       .required("Required description!!"),
   });
-  const isSubmitting = false;
 
+  //submit function
   const handleSubmit = (values) => {
     $.ajax({
       type: "POST",
@@ -75,6 +74,9 @@ function InputAuthor() {
     },
   });
 
+  //
+
+  //check return status
   useEffect(() => {
     if (parseInt(result) === 1) {
       alert("Insert complete!!");

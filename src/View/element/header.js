@@ -16,6 +16,13 @@ import {
 import linkn from "../../config/const";
 import Login from "../user/log/login";
 
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import { Button } from "@mui/material";
+import Alert from "@mui/material/Alert";
+
 function Header(props) {
   const [toogleBook, settoogleBook] = useState(false);
   const [toogleAuthor, settoogleAuthor] = useState(false);
@@ -28,13 +35,17 @@ function Header(props) {
   const [urlSearch, setUrlSearch] = useState(linkn.client_link + "home");
 
   const [openLogin, setOpenLogin] = useState(false);
+  const [isSubmitting, setSubmitting] = useState();
 
-  const handleClickOpenLogin = () => {
-    setOpenLogin(true);
+  const [searchFilter, setSearchFilter] = useState("book");
+  const [openSearchFilter, setOpenSearch] = useState(false);
+
+  const handleCloseSearch = () => {
+    setOpenSearch(false);
   };
 
-  const handleClose = () => {
-    setOpenLogin(false);
+  const handleOpenSearch = () => {
+    setOpenSearch(true);
   };
 
   const SignupSchema = Yup.object().shape({
@@ -55,9 +66,13 @@ function Header(props) {
     if (parseInt(props.isAdmin) === 1) {
       setUrlSearch(linkn.client_link + "book/list?search=" + searchInput);
     } else {
-      setUrlSearch(linkn.client_link + "home?search=" + searchInput);
+      if (searchFilter === "book") {
+        setUrlSearch(linkn.client_link + "home?search=" + searchInput);
+      } else if (searchFilter === "author") {
+        setUrlSearch(linkn.client_link + "book/user/list?search=" + searchInput + "&filter=author");
+      }
     }
-  }, [props.login, props.isAdmin, searchInput]);
+  }, [props.login, props.isAdmin, searchInput, searchFilter]);
 
   //console.log(localStorage.getItem("codeLogin"));
 
@@ -65,7 +80,6 @@ function Header(props) {
     if (isAdmin === "1") {
       return (
         <div class="container">
-        
           <Nav tabs>
             <NavItem>
               <NavLink href={linkn.client_link} style={{ color: "orange" }}>
@@ -163,14 +177,6 @@ function Header(props) {
             </NavItem>
             <NavItem>
               <NavLink
-                href={linkn.client_link + "author/user/list"}
-                style={{ color: "orange" }}
-              >
-                Author
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink
                 href={linkn.client_link + "buy_log/list"}
                 style={{ color: "orange" }}
               >
@@ -184,14 +190,46 @@ function Header(props) {
 
   console.log(isAdmin);
 
+  const handleSubmitM = (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setTimeout(() => {
+      const form = $(e.target);
+      $.ajax({
+        type: "POST",
+        url: linkn.server_link + "controller/user/logout.php",
+        data: form.serialize(),
+        success(data) {
+          console.log(data);
+          setResult(data);
+        },
+      });
+      //alert("Order complete!!");
+      setSubmitting(false);
+      //window.location.href = link.client_link + "buy_log/list";
+    }, 500);
+  };
+
+  useEffect(() => {
+    if (parseInt(result) === 1) {
+      alert("Logout complete!!");
+      setResult("-1");
+      window.location.href = linkn.client_link + "home";
+    }
+  }, [result]);
+
   return (
     <div>
       <div
         class="page-header"
-        style={{ backgroundColor: "#303134", marginTop: "0", padding: "15px 45px 15px" }}
+        style={{
+          backgroundColor: "#303134",
+          marginTop: "0",
+          padding: "15px 45px 15px",
+        }}
       >
         <div class="container">
-          <div class="row" style={{ paddingBottom: "0px"}}>
+          <div class="row" style={{ paddingBottom: "0px" }}>
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
               <img
                 src={require("../../image/book_logo.png")}
@@ -199,7 +237,14 @@ function Header(props) {
                 width={"50px"}
                 style={{ margin: "3px" }}
               />
-              <span style={{ color: "white", fontSize: "35px", fontFamily: "Brush Script MT", padding: "10px" }}>
+              <span
+                style={{
+                  color: "white",
+                  fontSize: "35px",
+                  fontFamily: "Brush Script MT",
+                  padding: "10px",
+                }}
+              >
                 Book store
               </span>
             </div>
@@ -218,24 +263,57 @@ function Header(props) {
                 >
                   {({ errors, touched }) => (
                     <form action={urlSearch.replace(/\s+/g, "+")} method="get">
-                      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                         <Field
                           name="search"
                           placeholder="Enter name to search"
                           className="form-control"
                           type="text"
                           onChange={(e) => setSearch(e.target.value)}
-                          style={{ margin: "4px", fontSize: "14px", fontStyle: 'italic' }}
+                          style={{
+                            margin: "4px",
+                            fontSize: "14px",
+                            fontStyle: "italic",
+                          }}
                         />
                       </div>
-                      <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                        <button
+
+                      <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                        <Select
+                          style={{
+                            backgroundColor: "white",
+                            color: "black",
+                            height: "35px",
+                            marginTop: "4px",
+                          }}
+                          name="filter"
+                          open={openSearchFilter}
+                          onClose={handleCloseSearch}
+                          onOpen={handleOpenSearch}
+                          value={searchFilter}
+                          label="Filter"
+                          onChange={(e) => setSearchFilter(e.target.value)}
+                          defaultValue="book"
+                        >
+                          <MenuItem value={"book"}>Book</MenuItem>
+                          <MenuItem value={"author"}>Author</MenuItem>
+                        </Select>
+                      </div>
+
+                      <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                        <Button
                           type="submit"
-                          class="btn btn-success btn-lg"
-                          style={{ margin: "4px", fontSize: "14px" }}
+                          className="btn btn-primary"
+                          color="primary"
+                          style={{
+                            margin: "4px",
+                            fontSize: "14px",
+                            backgroundColor: "green",
+                            color: "white",
+                          }}
                         >
                           Search
-                        </button>
+                        </Button>
                       </div>
                     </form>
                   )}
@@ -251,9 +329,12 @@ function Header(props) {
                 <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
                   {logout && (
                     <nav>
-                      <ul id="dropmenu_account"  style={{ marginTop: "1.2px" }}>
+                      <ul id="dropmenu_account" style={{ marginTop: "1.2px" }}>
                         <li>
-                          <a href={linkn.client_link} style={{fontWeight: 'bold'}}>
+                          <a
+                            href={linkn.client_link}
+                            style={{ fontWeight: "bold" }}
+                          >
                             Account <i class="fa fa-user"></i>
                           </a>
                           <ul>
@@ -277,11 +358,8 @@ function Header(props) {
                       </ul>
                     </nav>
                   )}
-                  
-                    {log && (                     
-                      <Login/>
-                    )}
-                  
+
+                  {log && <Login />}
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
                   <NavLink href={linkn.client_link + "signin"}>
@@ -301,10 +379,7 @@ function Header(props) {
                       </button>
                     )}
                   </NavLink>
-                  <form
-                    action={linkn.server_link + "controller/user/logout.php"}
-                    method="post"
-                  >
+                  <form method="post" onSubmit={(e) => handleSubmitM(e)}>
                     <input
                       type="hidden"
                       name="emailS"

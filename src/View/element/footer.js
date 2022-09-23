@@ -8,6 +8,7 @@ import {
   DropdownItem,
   Dropdown,
 } from "reactstrap";
+import link from '../../config/const';
 
 function Footer() {
   return (
@@ -25,17 +26,17 @@ function Footer() {
             <ul className="footer-links">
               <li>
                 <NavItem>
-                  <NavLink href="http://localhost:3000/">Home</NavLink>
+                  <NavLink href={link.client_link}>Home</NavLink>
                 </NavItem>
               </li>
               <li>
               <NavItem>
-                  <NavLink href="http://localhost:3000/book/">Book</NavLink>
+                  <NavLink href={link.client_link + 'book'}>Book</NavLink>
                 </NavItem>
               </li>
               <li>
               <NavItem>
-                  <NavLink href="http://localhost:3000/book/">Author</NavLink>
+                  <NavLink href={link.client_link + 'author'}>Author</NavLink>
                 </NavItem>
               </li>
             </ul>

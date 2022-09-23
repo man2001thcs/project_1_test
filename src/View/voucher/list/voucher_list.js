@@ -12,15 +12,17 @@ function Voucher_list(props) {
   const [listState, setListState] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
-  const urlVoucher = link.voucher_link + 
-  "user_voucher.json?timeStamp=" + GenerateRandomCode.NumCode(4);
+
+  //fetch data
+  const urlVoucher =
+    link.voucher_link +
+    "user_voucher.json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(
-          urlVoucher
-        );
+        const response = await axios.get(urlVoucher);
         setListState(response.data);
         console.log(response.data);
       } catch (err) {
@@ -39,7 +41,8 @@ function Voucher_list(props) {
       }
     });
   }, []);
-
+  //
+  
   const [currentPage, setCurrentPage] = useState(1);
 
   const currentTableData = useMemo(() => {
@@ -54,23 +57,30 @@ function Voucher_list(props) {
   console.log(listState?.length);
 
   console.log(currentTableData);
-  const itemmap1 = (currentTableData ?? listState?.slice(0, 6))?.map((item, index) => (
-    <Voucher_component
-      key={index}
-      id={item["WpVoucher"].id}
-      name={item["WpVoucher"].name}
-      threshold={item["WpVoucher"].threshold}
-      number_thres={item["WpVoucher"].number_thres}
-      discount={item["WpVoucher"].discount}
-      discount_rate={item["WpVoucher"].discount_rate}
-    />
-  ));
+  const itemmap1 = (currentTableData ?? listState?.slice(0, 6))?.map(
+    (item, index) => (
+      <Voucher_component
+        key={index}
+        id={item["WpVoucher"].id}
+        name={item["WpVoucher"].name}
+        threshold={item["WpVoucher"].threshold}
+        number_thres={item["WpVoucher"].number_thres}
+        discount={item["WpVoucher"].discount}
+        discount_rate={item["WpVoucher"].discount_rate}
+      />
+    )
+  );
 
   return (
     <div>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title" style={{fontSize: "20px", fontWeight: "bold"}}>Voucher list</h3>
+          <h3
+            class="panel-title"
+            style={{ fontSize: "20px", fontWeight: "bold" }}
+          >
+            Voucher list
+          </h3>
         </div>
         <div class="panel-body">
           <table class="table table-hover">

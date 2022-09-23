@@ -5,7 +5,6 @@ import link from "../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 import $ from "jquery";
 
-
 function AuthorCom(props) {
   const [appear, set_appear] = useState(false);
 
@@ -23,6 +22,7 @@ function AuthorCom(props) {
     setDelete(false);
   };
 
+  //submit function
   const handleSubmitM = (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -43,6 +43,7 @@ function AuthorCom(props) {
     }, 2000);
   };
 
+  //check return status
   useEffect(() => {
     if (parseInt(result) === 1) {
       alert("Change complete!!");
@@ -61,7 +62,9 @@ function AuthorCom(props) {
         <td>{props.specialization}</td>
         <td>
           {!deleting && (
-            <NavLink href={link.client_link + "author/edit?author_id=" + props.id} >
+            <NavLink
+              href={link.client_link + "author/edit?author_id=" + props.id}
+            >
               <button
                 type="button"
                 class="btn btn-success"

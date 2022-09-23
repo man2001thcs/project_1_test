@@ -38,7 +38,6 @@ function CartView(props) {
   //console.log(tempCart);
 
   //Fetch data session
-
   useEffect(() => {
     setAddress(props.address);
   }, [props.address]);
@@ -111,7 +110,9 @@ function CartView(props) {
       }
     });
   }, []);
+  //
 
+  //sum up price
   const totalPrice = tempCart?.reduce(
     (total, currentValue) =>
       (total =
@@ -120,6 +121,7 @@ function CartView(props) {
     0
   );
 
+  //find thing
   function find_author(author_id) {
     return listState2?.find((element) => {
       return element?.WpAuthor.id === author_id;
@@ -131,7 +133,9 @@ function CartView(props) {
       return element?.WpVoucher.id === voucher_id;
     });
   }
+  //
 
+  //empty status
   function empty_cart() {
     if (tempCart?.length === 0)
       return (
@@ -200,6 +204,57 @@ function CartView(props) {
     }
   }, [result]);
 
+  function find_author(author_id) {
+    return listState2?.find((element) => {
+      return element.WpAuthor.id === author_id;
+    });
+  }
+
+  const showAuthor = (author_id) => {
+    const itemmap_this = author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        console.log(item);
+        var author = find_author(item);
+        //console.log(author?.WpAuthor.name);
+        if (index === 0) {
+          return (
+            <span
+              style={{
+                width: "fit-content",
+                color: "black",
+                fontSize: "14px",
+                fontWeight: "lighter",
+                padding: "5px 8px 5px",
+                borderRadius: "10px",
+              }}
+            >
+              {author?.WpAuthor.name.length < 14
+                ? author?.WpAuthor.name
+                : author?.WpAuthor.name.substring(0, 13) + " ..."}
+            </span>
+          );
+        } else
+          return (
+            <span
+              style={{
+                width: "fit-content",
+                color: "black",
+                fontSize: "14px",
+                fontWeight: "lighter",
+                padding: "5px 5px 5px",
+                borderRadius: "10px",
+              }}
+            >
+              ...
+            </span>
+          );
+      });
+
+    return itemmap_this;
+  };
+
   const itemmap1 = tempCart?.map((item, index) => {
     return (
       <div>
@@ -209,7 +264,7 @@ function CartView(props) {
           book_id={item.book_id}
           name={item.name}
           type={item.type}
-          author={find_author(item.author_id)?.WpAuthor.name ?? "Not found!!"}
+          author={showAuthor(item.author_id) ?? "Not found!!"}
           price={item.price}
           number={item.number}
           totalPrice={item.total_price}
@@ -295,7 +350,7 @@ function CartView(props) {
             <div className="summary-total-items">
               <span className="total-items" /> Items: {itemsNum}
               <a
-                href="../../main_page/main/list.php"
+                href={link.client_link + "home"}
                 style={{ marginLeft: "15px" }}
               >
                 Turn back

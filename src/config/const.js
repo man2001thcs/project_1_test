@@ -4,6 +4,8 @@ const server_link = "http://localhost/php_server/";
 
 const image_link = "http://localhost/php_server/img/book/";
 
+const login_link = "http://localhost/php_server/img/login.gif";
+
 const book_link = "http://localhost/php_server/controller/book/log_session/";
 
 const author_link =
@@ -29,5 +31,6 @@ export default {
   user_link,
   receive_link,
   buylog_link,
-  voucher_link
+  voucher_link,
+  login_link
 };

@@ -26,6 +26,8 @@ function BookList(props) {
     return listState?.slice(firstPageIndex ?? 0, lastPageIndex ?? 6);
   }, [currentPage]);
 
+  //fetch data
+
   const urlBook =
     link.server_link +
     "controller/book/log_session/user_book.json?timeStamp=" +
@@ -53,6 +55,8 @@ function BookList(props) {
       }
     });
   }, []);
+
+  //show book list with condition
 
   function bookListShow() {
     if (searchInput?.length >= 2) {
@@ -121,14 +125,14 @@ function BookList(props) {
 
           {(searchInput?.length === undefined ||
             searchInput?.length === null) && (
-              <Pagination
-                className="pagination-bar"
-                currentPage={currentPage}
-                totalCount={listState?.length}
-                pageSize={PageSize}
-                onPageChange={(page) => setCurrentPage(page)}
-              ></Pagination>
-            )}
+            <Pagination
+              className="pagination-bar"
+              currentPage={currentPage}
+              totalCount={listState?.length}
+              pageSize={PageSize}
+              onPageChange={(page) => setCurrentPage(page)}
+            ></Pagination>
+          )}
         </div>
       </div>
     </div>

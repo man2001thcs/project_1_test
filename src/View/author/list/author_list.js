@@ -12,6 +12,8 @@ function Author_list(props) {
   const [listState, setListState] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
+
+  //fetch data
   const urlAccount = link.author_link + 
   "user_author.json?timeStamp=" + GenerateRandomCode.NumCode(4);
 

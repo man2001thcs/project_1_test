@@ -35,6 +35,7 @@ function EditAuthor() {
   }
   */
 
+  //fetch data
   const urlAuthor =
     link.server_link +
     "controller/author/log_session/user_author.json?timeStamp=" +
@@ -74,6 +75,7 @@ function EditAuthor() {
     setInputSpecial(author?.WpAuthor.specialization);
   }, [author]);
 
+  //validation form
   const SignupSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Too Short!")
@@ -92,6 +94,7 @@ function EditAuthor() {
       .required("Required description!!"),
   });
 
+  //submit function
   const handleSubmitM = (e) => {
     e.preventDefault();
     setSubmitting(true);

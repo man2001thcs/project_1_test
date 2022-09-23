@@ -129,8 +129,7 @@ function Login(props) {
         <DialogContent
           style={{
             height: "700px !important",
-            background:
-              "url(https://media4.giphy.com/media/BHNfhgU63qrks/giphy.gif) center center no-repeat",
+            background: `url(${link.login_link}) center center no-repeat`,
             backgroundSize: "cover",
           }}
         >

@@ -14,6 +14,7 @@ function CartViewCom(props) {
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
 
+  //fetch data
   const urlVoucher =
     link.voucher_link +
     "user_voucher.json?timeStamp=" +
@@ -81,7 +82,7 @@ function CartViewCom(props) {
       <div className="item">
         <div className="product-image">
           <img
-            src={link.image_link + props.book_id + '.jpg'}
+            src={link.image_link + props.book_id + "/1.jpg"}
             alt="Not found"
             className="product-frame"
           />

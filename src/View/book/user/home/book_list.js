@@ -15,7 +15,9 @@ function BookListU(props) {
 
   const search = useLocation().search;
   const searchInput = new URLSearchParams(search).get("search");
+  const searchFilter = new URLSearchParams(search).get("filter");
 
+  //fetch data
   const urlBook =
     link.book_link +
     "user_book.json?timeStamp=" +
@@ -71,55 +73,106 @@ function BookListU(props) {
       }
     });
   }, []);
+  //
 
   //console.log(listState2);
 
+
+  //find thing
   function find_author(author_id) {
     return listState2?.find((element) => {
-      return element?.WpAuthor.id === author_id;
+      return element.WpAuthor.id === author_id;
     });
   }
 
+  //show author from a string
+  const showAuthor = (book_this) => {
+    console.log(book_this?.WpBook.author_id);
+
+    const itemmap_this = book_this?.WpBook.author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        console.log(item);
+        var author = find_author(item);
+        //console.log(author?.WpAuthor.name);
+        if (index === 0) {
+          return (
+            <span
+              style={{
+                width: "fit-content",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: "lighter",
+                backgroundColor: "#F73195",
+                padding: "5px 8px 5px",
+                borderRadius: "10px",
+              }}
+            >
+              {author?.WpAuthor.name.length < 14
+                ? author?.WpAuthor.name
+                : author?.WpAuthor.name.substring(0, 13) + " ..."}
+            </span>
+          );
+        } else
+          return (
+            <span
+              style={{
+                width: "fit-content",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: "lighter",
+                backgroundColor: "#F73195",
+                padding: "5px 5px 5px",
+                borderRadius: "10px",
+              }}
+            >
+              ...
+            </span>
+          );
+      });
+
+    return itemmap_this;
+  };
+
   function check_type(type) {
-    if (type === "novel"){
+    if (type === "novel") {
       return "Novel";
-    } else  if (type === "short_story"){
+    } else if (type === "short_story") {
       return "Short story";
-    } else  if (type === "comic"){
+    } else if (type === "comic") {
       return "Comic";
     }
   }
-
 
   console.log(find_author("1"));
 
   function bookListShow(typeN) {
     if (searchInput?.length >= 2) {
-      //console.log("ok");
-      const bookListSearch = listState1
-        ?.filter(
-          (item) =>
-            item?.WpBook.type === typeN &&
-            (item?.WpBook.name).includes(searchInput)
-        )
-        .map((item, index) => {
-          return (
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-              <BookComU
-                key={index}
-                id={item["WpBook"].id}
-                name={item["WpBook"].name}
-                author_id={
-                  find_author(item["WpBook"].author_id)?.WpAuthor.name ??
-                  "Not found!!"
-                }
-                price={item["WpBook"].price}
-                type={check_type(item["WpBook"].type)}
-              ></BookComU>
-            </div>
-          );
-        });
-      return bookListSearch;
+      if (searchFilter === "book") {
+        //console.log("ok");
+        const bookListSearch = listState1
+          ?.filter(
+            (item) =>
+              item?.WpBook.type === typeN &&
+              (item?.WpBook.name).includes(searchInput)
+          )
+          .map((item, index) => {
+            return (
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+                <BookComU
+                  key={index}
+                  id={item["WpBook"].id}
+                  name={item["WpBook"].name}
+                  author_id={showAuthor(item) ?? "Not found!!"}
+                  price={item["WpBook"].price}
+                  type={check_type(item["WpBook"].type)}
+                ></BookComU>
+              </div>
+            );
+          });
+        return bookListSearch;
+      }
     } else {
       const bookListAll = listState1
         ?.filter((item) => item?.WpBook.type === typeN)
@@ -130,10 +183,7 @@ function BookListU(props) {
                 key={index}
                 id={item["WpBook"].id}
                 name={item["WpBook"].name}
-                author_id={
-                  find_author(item?.WpBook.author_id)?.WpAuthor.name ??
-                  "Not found!!"
-                }
+                author_id={showAuthor(item) ?? "Not found!!"}
                 price={item["WpBook"].price}
                 type={check_type(item["WpBook"].type)}
               ></BookComU>

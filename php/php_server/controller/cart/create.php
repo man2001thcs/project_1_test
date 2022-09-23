@@ -38,16 +38,23 @@ if (isset($_POST)) {
 			'total_price' => intval($_POST['total_price_all']) ?? "",
 			'transport' => $_POST['delivery-collection'] ?? "",		
 			'address' => $_POST['address'] ?? "",	
-			'voucher_id' =>	$_POST['voucher_id'] ?? "",	
-			'state' => 0 ?? 0,				
+			'voucher_id' =>	$_POST['voucher_id'] ?? "1",	
+			'state' => 0,				
 			'description' => 'Wait...',		
 			'code' => $_POST['code'] ?? ""
 		)
 	);
+
 	//echo json_encode($dataS1);
+	//echo json_encode($data);
+
+	//echo json_encode($_POST['voucher_id'] ?? 1);
 	//$receive->save($dataS1);
 
 	foreach($data as $item) {	
+
+		//echo json_encode($item);
+
 		$this_book = $book->findById($item['book_id']);	
 
 		if (isset($item['item_discount_id']) && ($item['item_discount_id'] ?? '') !=''){
@@ -65,7 +72,7 @@ if (isset($_POST)) {
 				}
 			}
 			
-			if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != ""){
+			if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != "0"){
 				if (in_array($_POST['voucher_id'], $voucher_array, TRUE)){
 					$re_check_discount++;
 				}	
@@ -73,18 +80,27 @@ if (isset($_POST)) {
 		} else {
 			$re_check_price = $re_check_price + intval($item['number']) * intval($this_book['WpBook']['price']);
 		}
+
 	}
 
-	if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != ""){
+	if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != "0"){
 		//
 	} else $re_check_discount = 1;	
 
+	//echo "item:" . $re_check_item;
+	//echo "item_Dis:" . $re_check_discount;
 
 	if ($re_check_item == 0 && $re_check_discount > 0){
 
-		$this_voucher_receive = $voucher->findById($_POST['voucher_id']);
-		$re_check_price = $re_check_price - intval($this_voucher_receive['WpVoucher']['discount'])  ?? 0;
-        $dataS1['WpReceive']['total_price']  = $re_check_price;
+		if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != "0"){
+			$this_voucher_receive = $voucher->findById($_POST['voucher_id']);
+			$re_check_price = $re_check_price - intval($this_voucher_receive['WpVoucher']['discount'])  ?? 0;
+        	$dataS1['WpReceive']['total_price']  = $re_check_price;
+		} else {
+        	$dataS1['WpReceive']['total_price']  = $re_check_price;
+		}
+
+		
 
 		if ($receive->save($dataS1)){
 
@@ -100,41 +116,31 @@ if (isset($_POST)) {
 						'item_voucher_id' => $item['item_discount_id'] ?? ''	
 					)
 				);
+
 				//echo json_encode($dataS2);
 			
-				if ($buy_log->save($dataS2)){
-
-					$item = $dataS2['WpBuyLog'];
-
-					$data_book = $book->findById($item['book_id']);
-
-					$data_book['WpBook']['remain_number'] = $data_book['WpBook']['remain_number'] - $item['number']; 
-					$data_book['WpBook']['bought_number'] = $data_book['WpBook']['bought_number'] + $item['number']; 
-					if ($book->save($data_book)){
-						$link = $user->login_code($_POST['emailS']).'.json';
-						$linkc = '../receive/log_session/'.$link;
-						$linkd = '../buy_log/log_session/'.$link;
-						
-						$user_info = $user->welcome($_POST['emailS']);
-
-						if (intval($user->is_admin($_POST['emailS']) == 1)){
-							$result4 = $receive->findAll();
-							$resultS = $buy_log->findAll();
-						} else {
-							$resultS = $buy_log->getDataWithCon($user_info['id']);
-							$result4 = $receive->getDataWithCon($user_info['id']);
-						}
-						echo 1;
-						file_put_contents($linkc, json_encode($result4));
-						file_put_contents($linkd, json_encode($resultS));	
-						//header('Location: ' . SERVER_URL . 'controller/receive/list.php?account=' . $_POST['emailS']);
-					} else {
-						echo 0;
-						//header('Location: ' . CLIENT_URL . 'user/cart?success=0', true, 301);										
-    				}
+				if ($buy_log->save($dataS2)){												
+					echo 1;			
+					//header('Location: ' . SERVER_URL . 'controller/receive/list.php?account=' . $_POST['emailS']);
 				}
 			}
-			//echo 1;
+
+			$user_info = $user->welcome($_POST['emailS']);
+
+			$linkc = '../receive/log_session/' . $_POST['code'] . '.json';
+			$linkd = '../buy_log/log_session/' . $_POST['code'] . '.json';
+
+			if (intval($user->is_admin($_POST['emailS']) == 1)){
+				$result4 = $receive->findAll();
+				$resultS = $buy_log->findAll();
+			} else {
+				$resultS = $buy_log->getDataWithCon($user_info['id']);
+				$result4 = $receive->getDataWithCon($user_info['id']);
+			}
+
+			file_put_contents($linkc, json_encode($result4));
+			file_put_contents($linkd, json_encode($resultS));	
+
 		} else {
 			echo 0;
 			//header('Location: ' . CLIENT_URL . 'user/cart?success=0', true, 301);

@@ -5,7 +5,6 @@ import $ from "jquery";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import link from "../../../../config/const";
-import { useLocation } from "react-router-dom";
 import GenerateRandomCode from "react-random-code-generator";
 
 import TextField from "@mui/material/TextField";
@@ -23,6 +22,8 @@ function InputBook() {
 
   const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
 
+
+  //fetch data session
   const urlAuthor =
     link.server_link +
     "controller/author/log_session/user_author.json?timeStamp=" +
@@ -79,6 +80,8 @@ function InputBook() {
     });
   }, []);
 
+  //
+
   /*
   const author_options = listState2?.sort(
     (a, b) => -(b?.WpAuthor.name).localeCompare(a?.WpAuthor.name)
@@ -89,6 +92,7 @@ function InputBook() {
   );
   */
 
+  //select voucher component
   function select_Voucher(voucher_options) {
     return (
       <div class="row">
@@ -119,35 +123,29 @@ function InputBook() {
     );
   }
 
+  //select author component
   function select_Author(author_options) {
     return (
       <div class="row">
         <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
           <div class="form-group">
-            <InputLabel style={{ fontSize: 12 }}>Author</InputLabel>
+            <InputLabel style={{ fontSize: 12 }}>Voucher</InputLabel>
             <Autocomplete
-              autoHighlight
-              options={author_options}
-              groupBy={(option) => option?.firstLetter}
+              multiple
+              id="tags-outlined"
+              options={author_options ?? []}
               getOptionLabel={(option) => option?.WpAuthor.name}
               getOptionValue={(option) => option?.WpAuthor.name}
               onChange={(e, value) =>
-                formik.setFieldValue("author_id", value?.WpAuthor.id)
+                formik.setFieldValue("author_id", JSON.stringify(value))
               }
               isOptionEqualToValue={(option, value) =>
                 option?.WpAuthor.id === value?.WpAuthor.id
               }
+              limitTags={3}
+              filterSelectedOptions
               renderInput={(params) => (
-                <TextField
-                  id="author_id"
-                  name="author_id"
-                  placeholder={"--Choose--"}
-                  {...params}
-                  inputProps={{
-                    ...params.inputProps,
-                    autoComplete: "off", // disable autocomplete and autofill
-                  }}
-                />
+                <TextField {...params} placeholder="Author" />
               )}
             />
           </div>
@@ -156,6 +154,7 @@ function InputBook() {
     );
   }
 
+  //validation
   const SignupSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Too Short!")
@@ -235,6 +234,7 @@ function InputBook() {
     },
   });
 
+  //check return status
   useEffect(() => {
     if (parseInt(result) === 1) {
       alert("Insert complete!!");
@@ -430,6 +430,7 @@ function InputBook() {
                   (a, b) => -(b?.WpAuthor.name).localeCompare(a?.WpAuthor.name)
                 )
               )}
+
               {select_Voucher(
                 listState3?.sort(
                   (a, b) =>

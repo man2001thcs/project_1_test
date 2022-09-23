@@ -17,16 +17,26 @@ if (!isset($user)) {
 $book = new Book();
 $author = new Author();
 $voucher_string = "";
+$author_string = "";
 
 if (isset($_POST)) {
 
-	$voucher = json_decode($_POST['voucher_id'], true);
-	usort($voucher, function($a, $b) {return strcmp($a['WpVoucher']['id'], $b['WpVoucher']['id']);});
-	foreach ($voucher as $item){
+	$voucher_array = json_decode($_POST['voucher_id'], true);
+	usort($voucher_array, function($a, $b) {return strcmp($a['WpVoucher']['id'], $b['WpVoucher']['id']);});
+	foreach ($voucher_array as $item){
 		//echo json_encode($item);
 		//echo $item['WpVoucher']['id'];
 		$temp = $voucher_string;
 		$voucher_string = $temp . strval($item['WpVoucher']['id']) . ';';
+	}
+
+	$author_array = json_decode($_POST['author_id'], true);
+	usort($author_array, function($a, $b) {return strcmp($a['WpAuthor']['id'], $b['WpAuthor']['id']);});
+	foreach ($author_array as $item){
+		//echo json_encode($item);
+		//echo $item['WpVoucher']['id'];
+		$temp = $author_string;
+		$author_string = $temp . strval($item['WpAuthor']['id']) . ';';
 	}
 
 	$dataSub = array(
@@ -40,9 +50,9 @@ if (isset($_POST)) {
 			'type' => $_POST['type']  ?? '',
 			'created' => date('Y-m-d H:i:s'),
 			'modified' => date('Y-m-d H:i:s'),			
-			'author_id' => $_POST['author_id'] ?? "",
+			'author_id' => $author_string ?? "",
 			'voucher_id' => $voucher_string ?? "",
-			
+			'image_number' => 1
 			)
 	);
 

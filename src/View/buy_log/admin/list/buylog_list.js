@@ -12,16 +12,17 @@ function BuyLogList(props) {
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
 
-  const urlReceive = link.receive_link +
+  //fetch data
+  const urlReceive =
+    link.receive_link +
     localStorage.getItem("codeLogin") +
-    ".json?timeStamp=" + GenerateRandomCode.NumCode(4);
+    ".json?timeStamp=" +
+    GenerateRandomCode.NumCode(4);
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(
-          urlReceive
-        );
+        const response = await axios.get(urlReceive);
         setListState(response.data);
         //console.log(response.data);
       } catch (err) {
@@ -40,6 +41,7 @@ function BuyLogList(props) {
       }
     });
   }, []);
+  //
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -75,7 +77,12 @@ function BuyLogList(props) {
     <div>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title" style={{fontSize: "20px", fontWeight: "bold"}}>Buy log list</h3>
+          <h3
+            class="panel-title"
+            style={{ fontSize: "20px", fontWeight: "bold" }}
+          >
+            Buy log list
+          </h3>
         </div>
         <div class="panel-body">
           <table class="table table-hover">
@@ -85,10 +92,10 @@ function BuyLogList(props) {
                 <th>User id</th>
                 <th>Created</th>
                 <th>Transport</th>
-                <th>Address</th>               
-                <th>Item</th>               
-                <th>Price</th>               
-                <th>Total price</th>              
+                <th>Address</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Total price</th>
                 <th>State</th>
                 <th>Message</th>
                 <th></th>

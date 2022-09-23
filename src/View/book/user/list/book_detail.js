@@ -9,6 +9,8 @@ import link from "../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 import "../../../../css/card_detail.css";
 import "../../../../css/quantity_button.css";
+import { Zoom, Fade } from "react-slideshow-image";
+import "../../../../css/image_slide_styles.css";
 
 function BookDes(props) {
   const [result, setResult] = useState("");
@@ -21,6 +23,18 @@ function BookDes(props) {
   const [listState1, setListState1] = useState();
   const [listState2, setListState2] = useState();
   const [listState3, setListState3] = useState();
+
+  const [imageLink, setImageLink] = useState([]);
+
+  const zoomOutProperties = {
+    duration: 5000,
+    transitionDuration: 500,
+    infinite: true,
+    indicators: true,
+    scale: 0.4,
+    arrows: true,
+  };
+
   const [toggleInfo, setToggle] = useState(true);
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
@@ -29,6 +43,7 @@ function BookDes(props) {
   const [discount_rate, setDiscount] = useState(0);
   const [item_n, setItemN] = useState(0);
 
+  //fetch data
   const urlBook =
     link.book_link +
     "user_book.json?timeStamp=" +
@@ -112,18 +127,31 @@ function BookDes(props) {
       }
     });
   }, []);
+  //
 
   const book = listState1?.find((element) => {
     return element.WpBook.id === id;
   });
+  console.log(imageLink);
+
+  useEffect(() => {
+    var images = [];
+    for (var i = 1; i <= book?.WpBook.image_number; i++) {
+      images.push(
+        link.image_link +
+          book?.WpBook.id +
+          "/" +
+          i +
+          ".jpg?timeStamp=" +
+          GenerateRandomCode.NumCode(4)
+      );
+    }
+    console.log(book?.WpBook.image_number);
+    setImageLink(images);
+  }, [book, listState1]);
+
   //console.log(book);
   //console.log(book?.WpBook.voucher_id?.split(","));
-
-  function find_author(author_id) {
-    return listState2?.find((element) => {
-      return element.WpAuthor.id === author_id;
-    });
-  }
 
   function find_voucher(voucher_id) {
     return listState3?.find((element) => {
@@ -131,24 +159,81 @@ function BookDes(props) {
     });
   }
 
-  const itemmap1 = listState1?.map((item, index) => {
-    if (item["WpBook"].type === book?.WpBook.type)
-      return (
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-          <BookComU
-            key={index}
-            id={item["WpBook"].id}
-            name={item["WpBook"].name}
-            author_id={
-              find_author(item["WpBook"].author_id)?.WpAuthor.name ??
-              "Not found!!"
-            }
-            price={item["WpBook"].price}
-            type="Novel"
-          ></BookComU>
-        </div>
-      );
-  });
+  function find_author(author_id) {
+    return listState2?.find((element) => {
+      return element.WpAuthor.id === author_id;
+    });
+  }
+  const showAuthor = (book_this) => {
+    //console.log(book_this?.WpBook.author_id);
+
+    const itemmap_this = book_this?.WpBook.author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        //console.log(item);
+        var author = find_author(item);
+        //console.log(author?.WpAuthor.name);
+        return <p style={{ color: "black" }}>{author?.WpAuthor.name}</p>;
+      });
+
+    return itemmap_this;
+  };
+
+  function checkAuthor(book_author_id, author_id) {
+    var search = book_author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      ?.find((element) => {
+        return parseInt(element) === parseInt(author_id);
+      });
+    if (search === null || search === undefined || search === "") return false;
+    else return true;
+  }
+
+  const itemmap0 = listState1
+    ?.filter((item2, index) => index < 5)
+    .map((item2, index) => {
+      const itemMap = book?.WpBook.author_id
+        ?.split(";")
+        ?.filter(
+          (item1) => item1 !== "" && checkAuthor(item2?.WpBook.author_id, item1)
+        );
+
+      if (itemMap !== undefined && itemMap !== null && itemMap.length >= 1) {
+        return (
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <BookComU
+              key={index}
+              id={item2?.WpBook.id}
+              name={item2?.WpBook.name}
+              author_id={showAuthor(item2) ?? "Not found!!"}
+              price={item2?.WpBook.price}
+              type="Novel"
+            ></BookComU>
+          </div>
+        );
+      }
+    });
+
+  const itemmap1 = listState1
+    ?.filter((item, index) => index < 5)
+    .map((item, index) => {
+      if (item["WpBook"].type === book?.WpBook.type) {
+        return (
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <BookComU
+              key={index}
+              id={item["WpBook"].id}
+              name={item["WpBook"].name}
+              author_id={showAuthor(item) ?? "Not found!!"}
+              price={item["WpBook"].price}
+              type="Novel"
+            ></BookComU>
+          </div>
+        );
+      }
+    });
 
   const itemmap2 = book?.WpBook.voucher_id
     ?.split(";")
@@ -207,6 +292,7 @@ function BookDes(props) {
     }
   }
 
+  //function for quantity button
   const increment = () => {
     if (valueNumber < book?.WpBook.remain_number)
       setValueNumber(valueNumber + 1);
@@ -217,6 +303,9 @@ function BookDes(props) {
       setValueNumber(valueNumber - 1);
     }
   };
+  //
+
+  //console.log(itemmap0);
 
   useEffect(() => {
     book?.WpBook.voucher_id
@@ -230,41 +319,46 @@ function BookDes(props) {
           setDiscount_id(voucher?.WpVoucher.id);
           setItemN(voucher?.WpVoucher.number_thres);
           setDiscount(voucher?.WpVoucher.discount_rate);
-          console.log(item_n);
-          console.log(discount_rate);
+          //.log(item_n);
+          // console.log(discount_rate);
         }
       });
   }, [listState3, valueNumber]);
 
   const addCart = () => {
-    if (valueNumber <= parseInt(book?.WpBook.remain_number)) {
-      const item = {
-        id: JSON.parse(localStorage.getItem("cart") || "[]").length,
-        book_id: book?.WpBook.id,
-        name: book?.WpBook.name,
-        type: book?.WpBook.type,
-        author_id: book?.WpBook.author_id,
-        number: valueNumber,
-        price: book?.WpBook.price,
-        total_price: parseInt(book?.WpBook.price) * parseInt(valueNumber),
-        rate:
-          parseInt(valueNumber) >= parseInt(item_n)
-            ? 1 - parseFloat(discount_rate)
-            : 1,
-        discount: book?.WpBook.voucher_id,
-        item_discount_id: discount_id,
-      };
+    if (props.login) {
+      if (valueNumber <= parseInt(book?.WpBook.remain_number)) {
+        const item = {
+          id: JSON.parse(localStorage.getItem("cart") || "[]").length,
+          book_id: book?.WpBook.id,
+          name: book?.WpBook.name,
+          type: book?.WpBook.type,
+          author_id: book?.WpBook.author_id,
+          number: valueNumber,
+          price: book?.WpBook.price,
+          total_price: parseInt(book?.WpBook.price) * parseInt(valueNumber),
+          rate:
+            parseInt(valueNumber) >= parseInt(item_n)
+              ? 1 - parseFloat(discount_rate)
+              : 1,
+          discount: book?.WpBook.voucher_id,
+          item_discount_id: discount_id,
+        };
 
-      var temp = JSON.parse(localStorage.getItem("cart") || "[]");
-      temp.push(item);
-      localStorage.setItem("cart", JSON.stringify(temp));
-      //localStorage.removeItem("cart");
+        var temp = JSON.parse(localStorage.getItem("cart") || "[]");
+        temp.push(item);
+        localStorage.setItem("cart", JSON.stringify(temp));
+        //localStorage.removeItem("cart");
 
-      alert("Add success!!");
+        alert("Add success!!");
+        window.location.href = link.client_link + "home";
+
+        //console.log(JSON.parse(localStorage.getItem("cart") || "[]"));
+      } else alert("Add failed!!");
+    } else {
+      alert("Please login!!");
       window.location.href = link.client_link + "home";
-
-      //console.log(JSON.parse(localStorage.getItem("cart") || "[]"));
-    } else alert("Add failed!!");
+    }
   };
 
   function description() {
@@ -293,10 +387,7 @@ function BookDes(props) {
             whitespace: "pre-line",
           }}
         >
-          <p>
-            Author Name:{" "}
-            {find_author(book?.WpBook.author_id)?.WpAuthor.name ?? "Not found"}
-          </p>
+          <p>Author Name: {showAuthor(book) ?? "Not found"}</p>
           <p>
             Phone number:{" "}
             {find_author(book?.WpBook.author_id)?.WpAuthor.phone ?? "Not found"}
@@ -362,21 +453,26 @@ function BookDes(props) {
               </h2>
               <h3>
                 Author:{" "}
-                <span style={{ fontSize: "20px" }}>
-                  {find_author(book?.WpBook.author_id)?.WpAuthor.name}
-                </span>
+                <span style={{ fontSize: "20px" }}>{showAuthor(book)}</span>
               </h3>
             </div>
-            <div
-              className="image"
-              style={{ minWidth: "300px", minHeight: "340px" }}
-            >
-              <img
-                src={link.image_link + id + ".jpg"}
-                alt="Not found"
-                width="300px"
-                height="340px"
-              />
+            <div className="slide-container">
+              <Fade {...zoomOutProperties}>
+                {imageLink.map((each, index) => (
+                  <div className="each-fade">
+                    <img
+                      key={index}
+                      style={{
+                        width: "100%",
+                        position: "center",
+                        marginTop: "auto",
+                        marginBottom: "auto",
+                      }}
+                      src={each}
+                    />
+                  </div>
+                ))}
+              </Fade>
             </div>
           </div>
           <div
@@ -389,7 +485,7 @@ function BookDes(props) {
             </div>
             <div className="description">
               <h2>Author</h2>
-              <p> {find_author(book?.WpBook.author_id)?.WpAuthor.name}</p>
+              <p> {showAuthor(book)}</p>
             </div>
             <div className="description">
               <h2>Category</h2>
@@ -404,7 +500,7 @@ function BookDes(props) {
                   style={{
                     display: "inline",
                     padding: "5px 6px 5px",
-                    fontStyle: 'italic'
+                    fontStyle: "italic",
                   }}
                 >
                   None
@@ -526,7 +622,41 @@ function BookDes(props) {
                 overflow: "auto",
               }}
             >
-              {itemmap1}
+              {itemmap1?.some((element) => element !== undefined) > 0 ? (
+                itemmap1
+              ) : (
+                <p>
+                  <strong>No similar book found</strong>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="card__footer">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2 class="panel-title">
+              <strong style={{ fontSize: "20px" }}>Same author</strong>
+            </h2>
+          </div>
+          <div class="panel-body">
+            <div
+              style={{
+                paddingLeft: "2%",
+                overflowX: "scroll",
+                height: "400px",
+                overflow: "auto",
+              }}
+            >
+              {itemmap0?.some((element) => element !== undefined) > 0 ? (
+                itemmap0
+              ) : (
+                <p>
+                  <strong>No similar book found</strong>
+                </p>
+              )}
             </div>
           </div>
         </div>
