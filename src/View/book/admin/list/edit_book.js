@@ -191,7 +191,6 @@ function EditBook() {
         temp.push(temp1);
       });
 
-
     //console.log(temp);
     return (
       <div class="row">
@@ -404,13 +403,15 @@ function EditBook() {
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row" style={{marginBottom: '130px'}}>
                 <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
                   <div className="form-group">
                     <InputLabel style={{ fontSize: 12 }}>Content</InputLabel>
                     <TextField
                       name="description"
                       className="form-control"
+                      multiline
+                      maxRows={10}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       inputProps={{ style: { fontSize: 16, padding: 10 } }}

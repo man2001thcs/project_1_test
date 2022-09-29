@@ -77,7 +77,6 @@ function BookListU(props) {
 
   //console.log(listState2);
 
-
   //find thing
   function find_author(author_id) {
     return listState2?.find((element) => {
@@ -93,7 +92,7 @@ function BookListU(props) {
       ?.split(";")
       ?.filter((item) => item !== "")
       .map((item, index) => {
-        console.log(item);
+        //console.log(item);
         var author = find_author(item);
         //console.log(author?.WpAuthor.name);
         if (index === 0) {
@@ -114,7 +113,7 @@ function BookListU(props) {
                 : author?.WpAuthor.name.substring(0, 13) + " ..."}
             </span>
           );
-        } else
+        } else if (index === 1)
           return (
             <span
               style={{
@@ -157,6 +156,13 @@ function BookListU(props) {
               item?.WpBook.type === typeN &&
               (item?.WpBook.name).includes(searchInput)
           )
+          .sort((a, b) =>
+            parseInt(a?.WpBook.bought_number) <
+            parseInt(b?.WpBook.bought_number)
+              ? 1
+              : -1
+          )
+          .filter((item, index) => index < 8)
           .map((item, index) => {
             return (
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
@@ -175,7 +181,13 @@ function BookListU(props) {
       }
     } else {
       const bookListAll = listState1
-        ?.filter((item) => item?.WpBook.type === typeN)
+        ?.filter((item, index) => item?.WpBook.type === typeN)
+        .sort((a, b) =>
+          parseInt(a?.WpBook.bought_number) < parseInt(b?.WpBook.bought_number)
+            ? 1
+            : -1
+        )
+        .filter((item, index) => index < 8)
         .map((item, index) => {
           return (
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">

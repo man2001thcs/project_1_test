@@ -174,65 +174,178 @@ function BookDes(props) {
         //console.log(item);
         var author = find_author(item);
         //console.log(author?.WpAuthor.name);
-        return <p style={{ color: "black" }}>{author?.WpAuthor.name}</p>;
+        if (index === 0) {
+          return (
+            <span
+              style={{
+                width: "fit-content",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: "lighter",
+                backgroundColor: "#F73195",
+                padding: "5px 8px 5px",
+                borderRadius: "10px",
+              }}
+            >
+              {author?.WpAuthor.name.length < 14
+                ? author?.WpAuthor.name
+                : author?.WpAuthor.name.substring(0, 13) + " ..."}
+            </span>
+          );
+        } else if (index === 1)
+          return (
+            <span
+              style={{
+                width: "fit-content",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: "lighter",
+                backgroundColor: "#F73195",
+                padding: "5px 5px 5px",
+                borderRadius: "10px",
+              }}
+            >
+              ...
+            </span>
+          );
       });
 
     return itemmap_this;
   };
 
-  function checkAuthor(book_author_id, author_id) {
+  const showAuthorTitle = (book_this) => {
+    //console.log(book_this?.WpBook.author_id);
+
+    const itemmap_this = book_this?.WpBook.author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        //console.log(item);
+        var author = find_author(item);
+        //console.log(author?.WpAuthor.name);
+
+        return (
+          <span
+            style={{
+              width: "fit-content",
+              color: "black",
+              fontSize: "18px",
+              fontWeight: "lighter",
+            }}
+          >
+            {author?.WpAuthor.name.length < 25
+              ? author?.WpAuthor.name
+              : author?.WpAuthor.name.substring(0, 25) + " ..."}
+          </span>
+        );
+      });
+
+    return itemmap_this;
+  };
+
+  const showAuthorLink = (book_this) => {
+    //console.log(book_this?.WpBook.author_id);
+
+    const itemmap_this = book_this?.WpBook.author_id
+      ?.split(";")
+      ?.filter((item) => item !== "")
+      .map((item, index) => {
+        //console.log(item);
+        var author = find_author(item);
+        //console.log(author?.WpAuthor.name);
+        return (
+          <p style={{ color: "black" }}>
+            <a
+              style={{ textDecoration: "none", color: "#55557B" }}
+              href={
+                link.client_link +
+                "book/user/list" +
+                "?search=" +
+                author?.WpAuthor.name +
+                "&filter=author"
+              }
+            >
+              {author?.WpAuthor.name}
+            </a>
+          </p>
+        );
+      });
+
+    return itemmap_this;
+  };
+
+  function checkAuthor(book_author_id) {
     var search = book_author_id
       ?.split(";")
       ?.filter((item) => item !== "")
-      ?.find((element) => {
-        return parseInt(element) === parseInt(author_id);
+      .map((item) => {
+        var searchB = book?.WpBook.author_id
+          ?.split(";")
+          ?.filter((item1) => item1 !== "")
+          ?.find((element) => {
+            return parseInt(element) === parseInt(item);
+          });
+        console.log(searchB);
+        if (searchB === null || searchB === undefined || searchB === "")
+          return false;
+        else return true;
       });
-    if (search === null || search === undefined || search === "") return false;
+    console.log(search);
+    if (
+      search === null ||
+      search === undefined ||
+      search === "" ||
+      search["0"] === false ||
+      search["0"] === "false"
+    )
+      return false;
     else return true;
   }
 
   const itemmap0 = listState1
-    ?.filter((item2, index) => index < 5)
+    ?.sort((a, b) =>
+      parseInt(a?.WpBook.bought_number) < parseInt(b?.WpBook.bought_number)
+        ? 1
+        : -1
+    )
+    ?.filter((item2, index) => checkAuthor(item2?.WpBook.author_id))
+    ?.filter((item2, index) => index < 4)
     .map((item2, index) => {
-      const itemMap = book?.WpBook.author_id
-        ?.split(";")
-        ?.filter(
-          (item1) => item1 !== "" && checkAuthor(item2?.WpBook.author_id, item1)
-        );
-
-      if (itemMap !== undefined && itemMap !== null && itemMap.length >= 1) {
-        return (
-          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-            <BookComU
-              key={index}
-              id={item2?.WpBook.id}
-              name={item2?.WpBook.name}
-              author_id={showAuthor(item2) ?? "Not found!!"}
-              price={item2?.WpBook.price}
-              type="Novel"
-            ></BookComU>
-          </div>
-        );
-      }
+      return (
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+          <BookComU
+            key={index}
+            id={item2?.WpBook.id}
+            name={item2?.WpBook.name}
+            author_id={showAuthor(item2) ?? "Not found!!"}
+            price={item2?.WpBook.price}
+            type="Novel"
+          ></BookComU>
+        </div>
+      );
     });
 
   const itemmap1 = listState1
-    ?.filter((item, index) => index < 5)
+    ?.filter((item) => item?.WpBook.type === book?.WpBook.type)
+    ?.sort((a, b) =>
+      parseInt(a?.WpBook.bought_number) < parseInt(b?.WpBook.bought_number)
+        ? 1
+        : -1
+    )
+    ?.filter((item, index) => index < 4)
     .map((item, index) => {
-      if (item["WpBook"].type === book?.WpBook.type) {
-        return (
-          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-            <BookComU
-              key={index}
-              id={item["WpBook"].id}
-              name={item["WpBook"].name}
-              author_id={showAuthor(item) ?? "Not found!!"}
-              price={item["WpBook"].price}
-              type="Novel"
-            ></BookComU>
-          </div>
-        );
-      }
+      return (
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+          <BookComU
+            key={index}
+            id={item["WpBook"].id}
+            name={item["WpBook"].name}
+            author_id={showAuthor(item) ?? "Not found!!"}
+            price={item["WpBook"].price}
+            type="Novel"
+          ></BookComU>
+        </div>
+      );
     });
 
   const itemmap2 = book?.WpBook.voucher_id
@@ -453,7 +566,7 @@ function BookDes(props) {
               </h2>
               <h3>
                 Author:{" "}
-                <span style={{ fontSize: "20px" }}>{showAuthor(book)}</span>
+                <span style={{ fontSize: "20px" }}>{showAuthorTitle(book)}</span>
               </h3>
             </div>
             <div className="slide-container">
@@ -485,7 +598,7 @@ function BookDes(props) {
             </div>
             <div className="description">
               <h2>Author</h2>
-              <p> {showAuthor(book)}</p>
+              <p> {showAuthorLink(book)}</p>
             </div>
             <div className="description">
               <h2>Category</h2>

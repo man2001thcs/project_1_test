@@ -90,9 +90,9 @@ if (isset($_POST)) {
 	//echo "item:" . $re_check_item;
 	//echo "item_Dis:" . $re_check_discount;
 
-	if ($re_check_item == 0 && $re_check_discount > 0){
+	if ($re_check_item == 0){
 
-		if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != "0"){
+		if (isset($_POST['voucher_id']) && ($_POST['voucher_id'] ?? '') != "0"  && $re_check_discount > 0){
 			$this_voucher_receive = $voucher->findById($_POST['voucher_id']);
 			$re_check_price = $re_check_price - intval($this_voucher_receive['WpVoucher']['discount'])  ?? 0;
         	$dataS1['WpReceive']['total_price']  = $re_check_price;

@@ -83,7 +83,7 @@ if (isset($_POST)) {
 			'modified' => date('Y-m-d H:i:s') ?? $this_data['WpBook']['modified'],
 			'author_id' =>  $author_string ?? $this_data['WpBook']['author_id'],
 			'voucher_id' => $voucher_string ?? $this_data['WpBook']['voucher_id'],
-			'image_number' => 1
+			'image_number' => $this_data['WpBook']['image_number']
 			)
 	);
 	//echo json_encode($dataSub);

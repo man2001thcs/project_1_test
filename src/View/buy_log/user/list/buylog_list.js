@@ -5,12 +5,17 @@ import { useMemo } from "react";
 import Pagination from "../../../element/Pagination/Pagination";
 import link from "../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
+import $ from "jquery";
+import Alert from "@mui/material/Alert";
 let PageSize = 6;
 
 function BuyLogList(props) {
   const [listState, setListState] = useState();
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
+  const [listStateFilter, setListStateFilter] = useState();
+
+  const [receiveState, setReceiveState] = useState(0);
 
   //fetch data
   const urlReceive =
@@ -44,21 +49,60 @@ function BuyLogList(props) {
     });
   }, []);
 
+  function wait_onclick() {
+    setReceiveState(0);
+    $("#wait_button").addClass("active");
+    $("#accept_button").removeClass("active");
+    $("#complete_button").removeClass("active");
+    $("#cancel_button").removeClass("active");
+  }
+
+  function accept_onclick() {
+    setReceiveState(1);
+    $("#wait_button").removeClass("active");
+    $("#accept_button").addClass("active");
+    $("#complete_button").removeClass("active");
+    $("#cancel_button").removeClass("active");
+  }
+
+  function complete_onclick() {
+    setReceiveState(2);
+    $("#wait_button").removeClass("active");
+    $("#accept_button").removeClass("active");
+    $("#complete_button").addClass("active");
+    $("#cancel_button").removeClass("active");
+  }
+
+  function cancel_onclick() {
+    setReceiveState(3);
+    $("#wait_button").removeClass("active");
+    $("#accept_button").removeClass("active");
+    $("#complete_button").removeClass("active");
+    $("#cancel_button").addClass("active");
+  }
+  useEffect(() => {
+    setListStateFilter(
+      listState?.filter(
+        (item) => parseInt(item?.WpReceive.state) === parseInt(receiveState)
+      )
+    );
+  }, [listState, receiveState]);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const currentTableData = useMemo(() => {
     if (currentPage === 1) {
-      return listState?.slice(0, 6);
+      return listStateFilter?.slice(0, 6);
     }
     const firstPageIndex = (currentPage - 1) * PageSize;
     const lastPageIndex = firstPageIndex + PageSize;
-    return listState?.slice(firstPageIndex ?? 0, lastPageIndex ?? 6);
+    return listStateFilter?.slice(firstPageIndex ?? 0, lastPageIndex ?? 6);
   }, [currentPage]);
 
   //console.log(listState?.length);
 
   //console.log(currentTableData);
-  const itemmap1 = (currentTableData ?? listState?.slice(0, 6))?.map(
+  const itemmap1 = (currentTableData ?? listStateFilter?.slice(0, 6))?.map(
     (item, index) => (
       <BuyLogCom
         key={index}
@@ -98,6 +142,74 @@ function BuyLogList(props) {
           </h3>
         </div>
         <div class="panel-body">
+          <div
+            className="card__footer"
+            style={{ marginTop: "20px", marginBottom: "20px" }}
+          >
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <button
+                  id="wait_button"
+                  name="wait_button"
+                  class="nav-link active"
+                  style={{
+                    color: "black",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                  onClick={() => wait_onclick()}
+                >
+                  Wait
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  style={{
+                    color: "black",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                  id="accept_button"
+                  name="accept_button"
+                  class="nav-link"
+                  onClick={() => accept_onclick()}
+                >
+                  On going
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  style={{
+                    color: "black",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                  id="complete_button"
+                  name="complete_button"
+                  class="nav-link"
+                  onClick={() => complete_onclick()}
+                >
+                  Complete
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  style={{
+                    color: "black",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                  id="cancel_button"
+                  name="cancel_button"
+                  class="nav-link"
+                  onClick={() => cancel_onclick()}
+                >
+                  Cancel
+                </button>
+              </li>
+            </ul>
+          </div>
+          
           <table class="table table-hover">
             <thead>
               <tr>
@@ -113,13 +225,23 @@ function BuyLogList(props) {
               </tr>
             </thead>
             {itemmap1}
-            {empty_buylog()}
+            {listStateFilter?.length === 0 && (
+              <tbody>
+                <tr>
+                  <td>
+                    <Alert severity="error" style={{ marginBottom: "20px" }}>
+                      No item found
+                    </Alert>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           </table>
 
           <Pagination
             className="pagination-bar"
             currentPage={currentPage}
-            totalCount={listState?.length}
+            totalCount={listStateFilter?.length}
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           ></Pagination>

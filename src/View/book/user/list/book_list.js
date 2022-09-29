@@ -149,10 +149,18 @@ function BookList(props) {
           )
         );
       } else {
-        setListStateSearch(listState);
+        setListStateSearch(
+          listState?.sort(
+            (a, b) => -(b?.WpBook.name).localeCompare(a?.WpBook.name)
+          )
+        );
       }
     } else {
-      setListStateSearch(listState);
+      setListStateSearch(
+        listState?.sort(
+          (a, b) => -(b?.WpBook.name).localeCompare(a?.WpBook.name)
+        )
+      );
     }
   }, [listState, searchFilter, searchInput]);
 
@@ -170,12 +178,11 @@ function BookList(props) {
     return listStateSearch?.slice(firstPageIndex ?? 0, lastPageIndex ?? 6);
   }, [currentPage, listStateSearch]);
 
-
   const itemmap1 = (currentTableData ?? listState?.slice(0, 6))?.map(
     (item, index) => (
       <BookCom
         key={index}
-        id={item["WpBook"].id}
+        id={item?.WpBook.id}
         name={item["WpBook"].name}
         author={showAuthor(item)}
         price={item["WpBook"].price}
@@ -194,14 +201,14 @@ function BookList(props) {
             class="panel-title"
             style={{ fontSize: "20px", fontWeight: "bold" }}
           >
-            Book list {(searchFilter==='author') && ": Author search"}
+            Book list {searchFilter === "author" && ": Author search (" + searchInput + ")"}
           </h3>
         </div>
         <div class="panel-body">
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>ID</th>
+                <th></th>
                 <th>Book name</th>
                 <th>Author</th>
                 <th>Price</th>

@@ -13,6 +13,7 @@ import './css/font-awesome-4.7.0/font-awesome-4.7.0/css/font-awesome.min.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Slideshow from "./View/test/alertD";
+import Chart_test from "./View/test/chart_test";
 
 import Main_page from "./View/main_page";
 import Header from "./View/element/header";
@@ -25,6 +26,7 @@ import BookList from "./View/book/admin/list/book_list";
 import AuthorList from "./View/author/list/author_list";
 import EditBook from "./View/book/admin/list/edit_book";
 import EditAuthor from "./View/author/list/edit_author";
+import Chart_book from "./View/book/admin/list/book_statistic";
 
 import VoucherList from "./View/voucher/list/voucher_list";
 import InputVoucher from "./View/voucher/input/input_voucher";
@@ -133,12 +135,16 @@ function App() {
                   <Route path="book/input" element={<InputBook />} />
                   <Route path="book/edit" element={<EditBook />} />
                   <Route path="book/list" element={<BookList />} />
+                  <Route path="book/statistic" element={<Chart_book />} />
+
                   <Route path="author/input" element={<InputAuthor />} />
                   <Route path="author/edit" element={<EditAuthor />} />
                   <Route path="author/list" element={<AuthorList />} />
+
                   <Route path="voucher/input" element={<InputVoucher />} />
                   <Route path="voucher/edit" element={<EditVoucher />} />
                   <Route path="voucher/list" element={<VoucherList />} />
+
                   <Route path="buy_log/list" element={<BuyLogList_Admin />} />
                 </Route>
               )}
@@ -162,7 +168,6 @@ function App() {
 
               <Route path="login" element={<Login />} />
               <Route path="signin" element={<SignIn />} />
-              <Route path="test" element={<Slideshow />} />
 
               {loginState?.length !== 0 && typeof loginState !== "undefined" && (
                 <Route>

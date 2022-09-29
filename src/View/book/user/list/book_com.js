@@ -6,15 +6,27 @@ import link_con from "../../../../config/const";
 function BookCom(props) {
   const [result, setResult] = useState("");
   const [link, setLink] = useState("");
+  const [id_book, setid_book] = useState(props.id);
 
   useEffect(() => {
     setLink(link_con.client_link + "book/user/detail?id=" + props.id);
   }, [props.id]);
 
+  console.log(props.id);
+
   return (
     <tbody>
       <tr>
-        <td>{props.id}</td>
+        <td>
+          <div style={{ width: "120px", height: "150px" }}>
+            <img
+              src={link_con.image_link + props.id + "/1.jpg"}
+              alt="Not found"
+              className="product-frame"
+              style={{ height: "100%" }}
+            />
+          </div>
+        </td>
         <td>{props.name}</td>
         <td>{props.author}</td>
         <td>{props.price}</td>
@@ -28,6 +40,7 @@ function BookCom(props) {
               class="btn btn-success"
               id="viewButton"
               name="viewButton"
+              style={{ fontSize: "14px" }}
             >
               View
             </button>

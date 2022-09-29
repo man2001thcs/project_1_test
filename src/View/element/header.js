@@ -69,7 +69,12 @@ function Header(props) {
       if (searchFilter === "book") {
         setUrlSearch(linkn.client_link + "home?search=" + searchInput);
       } else if (searchFilter === "author") {
-        setUrlSearch(linkn.client_link + "book/user/list?search=" + searchInput + "&filter=author");
+        setUrlSearch(
+          linkn.client_link +
+            "book/user/list?search=" +
+            searchInput +
+            "&filter=author"
+        );
       }
     }
   }, [props.login, props.isAdmin, searchInput, searchFilter]);
@@ -102,6 +107,9 @@ function Header(props) {
                 <DropdownItem divider />
                 <DropdownItem href={linkn.client_link + "book/list"}>
                   Book list
+                </DropdownItem>
+                <DropdownItem href={linkn.client_link + "book/statistic"}>
+                  Book statistic
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -277,28 +285,29 @@ function Header(props) {
                           }}
                         />
                       </div>
-
-                      <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-                        <Select
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            height: "35px",
-                            marginTop: "4px",
-                          }}
-                          name="filter"
-                          open={openSearchFilter}
-                          onClose={handleCloseSearch}
-                          onOpen={handleOpenSearch}
-                          value={searchFilter}
-                          label="Filter"
-                          onChange={(e) => setSearchFilter(e.target.value)}
-                          defaultValue="book"
-                        >
-                          <MenuItem value={"book"}>Book</MenuItem>
-                          <MenuItem value={"author"}>Author</MenuItem>
-                        </Select>
-                      </div>
+                      {parseInt(props.isAdmin) !== 1 && (
+                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                          <Select
+                            style={{
+                              backgroundColor: "white",
+                              color: "black",
+                              height: "35px",
+                              marginTop: "4px",
+                            }}
+                            name="filter"
+                            open={openSearchFilter}
+                            onClose={handleCloseSearch}
+                            onOpen={handleOpenSearch}
+                            value={searchFilter}
+                            label="Filter"
+                            onChange={(e) => setSearchFilter(e.target.value)}
+                            defaultValue="book"
+                          >
+                            <MenuItem value={"book"}>Book</MenuItem>
+                            <MenuItem value={"author"}>Author</MenuItem>
+                          </Select>
+                        </div>
+                      )}
 
                       <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
                         <Button
