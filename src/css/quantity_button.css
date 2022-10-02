@@ -14,10 +14,12 @@
     font-size: 1.5rem;
     background: #f3f3f3;
     color: #888;
+    color: #c7c6c6;
     border: 0 solid #dbdbdb;
     text-align: center;
     text-shadow: 0 1px 0 rgba(255, 255, 255, .6);
     cursor: pointer;
+    
 }
 .quantity-input__modifier:hover {
     background: #dadada;
