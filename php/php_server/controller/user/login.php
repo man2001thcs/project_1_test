@@ -44,6 +44,7 @@ if ($_POST) {
 		//$result2 = $author->findAll();	
 		//$result2 = $author->findAll();
 		//file_put_contents($linkc, json_encode($result2));
+		
 		//file_put_contents($linku1, json_encode($result2));
 
 
