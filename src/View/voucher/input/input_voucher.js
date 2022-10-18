@@ -94,14 +94,6 @@ function InputVoucher() {
 
   return (
     <div>
-      <h1>Insert Voucher</h1>
-      {parseInt(success) === 0 && (
-        <h3 style={{ color: "red" }}>Insert failed</h3>
-      )}
-      {parseInt(success) === 1 && (
-        <h3 style={{ color: "green" }}>Insert successed</h3>
-      )}
-
       <form
         action={link.server_link + "controller/voucher/create.php"}
         method="post"
@@ -115,6 +107,11 @@ function InputVoucher() {
             padding: "30px 30px 30px",
           }}
         >
+            <h2 style={{
+            fontWeight: "bold",
+            fontSize: '24px',
+            marginBottom: '20px',
+          }}><i class="fa fa-info-circle"></i> Insert voucher </h2>
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
               <div className="form-group">

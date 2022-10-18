@@ -164,7 +164,7 @@ function EditAuthor() {
             <div class="row">
               <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                 <div className="form-group">
-                  <label htmlFor="address">Address:</label>
+                  <label htmlFor="address">Address</label>
                   <TextField
                     name="address"
                     className="form-control"
@@ -179,7 +179,7 @@ function EditAuthor() {
             <div class="row">
               <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                 <div className="form-group">
-                  <label htmlFor="phone">Phone:</label>
+                  <label htmlFor="phone">Phone</label>
                   <TextField
                     name="phone"
                     className="form-control"
@@ -194,7 +194,7 @@ function EditAuthor() {
             <div class="row">
               <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                 <div className="form-group">
-                  <label htmlFor="specialization">Description:</label>
+                  <label htmlFor="specialization">Description</label>
                   <TextField
                     name="specialization"
                     className="form-control"

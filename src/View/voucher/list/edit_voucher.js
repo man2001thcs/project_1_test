@@ -137,14 +137,6 @@ function EditVoucher() {
 
   return (
     <div>
-      <h1>Voucher edit</h1>
-      {parseInt(success) === 0 && (
-        <h3 style={{ color: "red" }}>Change failed</h3>
-      )}
-      {parseInt(success) === 1 && (
-        <h3 style={{ color: "green" }}>Change successed</h3>
-      )}
-
       <form method="post" onSubmit={(e) => handleSubmitM(e)}>
         <div
           class="container"
@@ -154,6 +146,15 @@ function EditVoucher() {
             padding: "30px 30px 30px",
           }}
         >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              marginBottom: "20px",
+            }}
+          >
+            <i class="fa fa-info-circle"></i> Edit voucher{" "}
+          </h2>
           <div class="row">
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
               <div className="form-group">

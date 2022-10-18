@@ -133,8 +133,13 @@ function BuyLogCom(props) {
           <td></td>
           <td>
             {" "}
-            {book?.WpBook.name} (ID: {item?.WpBuyLog.id}) x{" "}
-            {item?.WpBuyLog.number}
+            <a
+              href={link.client_link + "book/user/detail?id=" + book?.WpBook.id}
+              style={{textDecoration: "none"}}
+            >
+              {book?.WpBook.name}
+            </a>{" "}
+            (ID: {item?.WpBuyLog.id}) x {item?.WpBuyLog.number}
           </td>
           <td>{item?.WpBuyLog.price}</td>
           <td></td>

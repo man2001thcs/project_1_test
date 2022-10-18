@@ -54,6 +54,14 @@ function BuyLogList(props) {
     $("#accept_button").removeClass("active");
     $("#complete_button").removeClass("active");
     $("#cancel_button").removeClass("active");
+
+    $("#wait_button").css(
+      "background-image",
+      "linear-gradient(#c7c6c6, white)"
+    );
+    $("#accept_button").css("background-image", "none");
+    $("#complete_button").css("background-image", "none");
+    $("#cancel_button").css("background-image", "none");
   }
 
   function accept_onclick() {
@@ -62,6 +70,14 @@ function BuyLogList(props) {
     $("#accept_button").addClass("active");
     $("#complete_button").removeClass("active");
     $("#cancel_button").removeClass("active");
+
+    $("#wait_button").css("background-image", "none");
+    $("#accept_button").css(
+      "background-image",
+      "linear-gradient(#c7c6c6, white)"
+    );
+    $("#complete_button").css("background-image", "none");
+    $("#cancel_button").css("background-image", "none");
   }
 
   function complete_onclick() {
@@ -70,6 +86,14 @@ function BuyLogList(props) {
     $("#accept_button").removeClass("active");
     $("#complete_button").addClass("active");
     $("#cancel_button").removeClass("active");
+
+    $("#wait_button").css("background-image", "none");
+    $("#accept_button").css("background-image", "none");
+    $("#complete_button").css(
+      "background-image",
+      "linear-gradient(#c7c6c6, white)"
+    );
+    $("#cancel_button").css("background-image", "none");
   }
 
   function cancel_onclick() {
@@ -78,18 +102,31 @@ function BuyLogList(props) {
     $("#accept_button").removeClass("active");
     $("#complete_button").removeClass("active");
     $("#cancel_button").addClass("active");
+
+    $("#wait_button").css("background-image", "none");
+    $("#accept_button").css("background-image", "none");
+    $("#complete_button").css("background-image", "none");
+    $("#cancel_button").css(
+      "background-image",
+      "linear-gradient(#c7c6c6, white)"
+    );
   }
 
   useEffect(() => {
-    setListStateFilter(listState?.filter(
-      (item) => parseInt(item?.WpReceive.state) === parseInt(receiveState)
-    ));
+    setListStateFilter(
+      listState
+        ?.filter(
+          (item) => parseInt(item?.WpReceive.state) === parseInt(receiveState)
+        )
+        .sort((a, b) =>
+          parseInt(a?.WpReceive.id) < parseInt(b?.WpReceive.id) ? 1 : -1
+        )
+    );
   }, [listState, receiveState]);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const currentTableData = useMemo(() => {
-
     if (currentPage === 1) {
       return listStateFilter?.slice(0, 6);
     }
@@ -100,7 +137,7 @@ function BuyLogList(props) {
 
   //console.log(listState?.length);
   //console.log(currentTableData);
-  
+
   const itemmap1 = (currentTableData ?? listStateFilter?.slice(0, 6))?.map(
     (item, index) => (
       <BuyLogCom
@@ -143,6 +180,7 @@ function BuyLogList(props) {
                     color: "black",
                     fontWeight: "bold",
                     fontSize: "16px",
+                    backgroundImage: "linear-gradient(#c7c6c6, white)",
                   }}
                   onClick={() => wait_onclick()}
                 >
@@ -214,13 +252,13 @@ function BuyLogList(props) {
               </tr>
             </thead>
             {itemmap1}
-            {(listStateFilter?.length === 0) && (
+            {listStateFilter?.length === 0 && (
               <tbody>
                 <tr>
                   <td>
-                  <Alert severity="error" style={{ marginBottom: "20px" }}>
-                    No item found
-                  </Alert>
+                    <Alert severity="error" style={{ marginBottom: "20px" }}>
+                      No item found
+                    </Alert>
                   </td>
                 </tr>
               </tbody>
